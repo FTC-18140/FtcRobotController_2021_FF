@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Math.abs;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-
 
 public class Thunderbot_2021 {
     /**
@@ -15,7 +15,6 @@ public class Thunderbot_2021 {
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
-
 
     /**
      * local OpMode members
@@ -62,6 +61,43 @@ public class Thunderbot_2021 {
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+    //method for movement of mecanum drive
+    public void joyStickDrive (double forward, double right, double clockwise){
+
+        //inverse kinematic transformation
+        // converts inputs to 4 motor commands:
+        double mfrontLeft = forward + clockwise + right;
+        double mfrontRight = forward - clockwise - right;
+        double mbackLeft = forward + clockwise - right;
+        double mbackRight = forward - clockwise + right;
+
+        //wheel speed commands
+        // verify that  no wheel speed command exceeds magnitude of 1
+        //if a wheel speeed command exeeds 1 then normalize all speeds to 1 or less
+        double max = abs(mfrontLeft);
+        if (abs(mfrontRight) > max) {
+            max = abs(mfrontRight);
+        }
+        if (abs(mbackLeft) > max) {
+            max = abs(mbackLeft);
+        }
+        if (abs(mbackRight) > max) {
+            max = abs(mbackRight);
+        }
+        if (max > 1) {
+            mfrontLeft /= max;
+            mfrontRight /= max;
+            mbackLeft /= max;
+            mbackRight /= max;
+        }
+
+        //loading of normalized speed values to motors
+        rightFront.setPower(mfrontRight);
+        rightRear.setPower(mbackRight);
+        leftFront.setPower(mfrontLeft);
+        leftRear.setPower(mbackLeft);
     }
 
     // Stop all motors
