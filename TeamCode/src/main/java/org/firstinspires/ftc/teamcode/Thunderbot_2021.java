@@ -11,6 +11,10 @@ public class Thunderbot_2021 {
     /**
      * Public OpMode members
      */
+    boolean inMotion;
+    int targetPosition;
+    int currentPosition;
+
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
@@ -21,6 +25,13 @@ public class Thunderbot_2021 {
      */
     HardwareMap hwMap = null;
     private Telemetry telemetry;
+
+    // converts inches to motor ticks
+    static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
+    static final double DRIVE_GEAR_REDUCTION = 20; //hex motor gear box has one 4:1 and one 5:1 gear box
+    static final double WHEEL_DIAMETER_INCHES = 4.0; // For figuring circumference
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double COUNTS_PER_CM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / ((WHEEL_DIAMETER_INCHES*2.54) * 3.1415);
 
     /**
      * Constructor
@@ -99,6 +110,27 @@ public class Thunderbot_2021 {
         leftFront.setPower(mfrontLeft);
         leftRear.setPower(mbackLeft);
     }
+
+    //drive robot a specified distance
+    public boolean driveForward (double speed, double distance){
+        //declare variable to use
+
+        if (inMotion==false){
+            inMotion= true;
+            int targetPosition = (int) ((distance * COUNTS_PER_CM) + leftFront.getCurrentPosition());
+        }
+        int currentPosition = leftFront.getCurrentPosition();
+        //movement
+        if (targetPosition-currentPosition<=0){
+            joyStickDrive(speed,0,0);
+        }
+        else{
+            stop();
+            inMotion=false;
+        }
+        return !inMotion;
+    }
+
 
     // Stop all motors
     public void stop() {
