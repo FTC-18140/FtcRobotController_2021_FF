@@ -119,7 +119,7 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Note: use sleep when you want the robot to stop for a selected time
         while (opModeIsActive()){
-            if (robot.tfod != null) {
+          /*  if (robot.tfod != null) {
                 robot.tfod.shutdown();
             }
 
@@ -140,7 +140,7 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
                 robot.powerShot();
             }
 
-            break;
+            break;*/
         }
 
             telemetry.addData("Path", "Complete");
