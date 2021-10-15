@@ -546,7 +546,7 @@ public class Thunderbot {
         encStartPosition = leftFront.getCurrentPosition();
         telemetry.addData("startPos", encStartPosition);
 
-        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) {
+        while (leftFront.getCurrentPosition() <= (distance * COUNTS_PER_INCH + encStartPosition)) {
             double currentAngle = updateHeading();
             telemetry.addData("current heading", currentAngle);
 

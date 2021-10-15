@@ -18,10 +18,43 @@ public class Auto extends OpMode {
 
     }
 
+
+    int state = 0;
     boolean done = false;
     public void loop() {
-        if(!done){
-            done = robot.drive(100, 0.5);
+        switch (state) {
+            case 0: // Drive diagonal 45 degrees
+            if (!done) {
+                done = robot.drive(45, 80, 0.5);
+            } else {
+                robot.stop();
+                done = false;
+                state++;
+            }
+            break;
+
+            case 1: // Forward 30cm
+                if (!done) {
+                    done = robot.drive(0, 30, 0.5);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 2: // Backward 30cm
+                if (!done) {
+                    done = robot.drive(0, 30, -0.5);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            default:
+                break;
         }
     }
 }

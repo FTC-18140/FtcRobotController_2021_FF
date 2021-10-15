@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.toRadians;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -106,13 +107,18 @@ public class Thunderbot_2021 {
 
     double initialPosition = 0;
     boolean moving = false;
-    public boolean drive (double distance, double power) { // add direction double use 
+    public boolean drive (double direction, double distance, double power) { // add direction double use
+
+        double xValue = Math.sin(toRadians(direction)) * power;
+        double yValue = Math.cos(toRadians(direction)) * power;
+
+
         if(!moving){
             initialPosition = leftFront.getCurrentPosition();
             moving = true;
         }
 
-        double position = leftFront.getCurrentPosition() - initialPosition;
+        double position = abs(leftFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
 
         if(positionInCM >= distance){
@@ -121,7 +127,7 @@ public class Thunderbot_2021 {
             return true;
 
         } else {
-            joystickDrive(power, 0, 0);
+            joystickDrive(yValue, xValue, 0);
             return false;
         }
     }
