@@ -3,11 +3,17 @@ package org.firstinspires.ftc.teamcode;
 import static java.lang.Math.abs;
 import static java.lang.Math.toRadians;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 
 public class Thunderbot_2021 {
@@ -18,6 +24,8 @@ public class Thunderbot_2021 {
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
+
+    BNO055IMU imu = null;
 
 
     // converts inches to motor ticks
@@ -105,15 +113,21 @@ public class Thunderbot_2021 {
         rightRear.setPower(backRight);
     }
 
+    double gyStartAngle = 0;
     double initialPosition = 0;
     boolean moving = false;
-    public boolean drive (double direction, double distance, double power) { // add direction double use
+    public boolean drive (double direction, double distance, double power) {
 
         double xValue = Math.sin(toRadians(direction)) * power;
         double yValue = Math.cos(toRadians(direction)) * power;
-
+        double currentAngle = updateHeading();
+        double leftFrontSpeed;
+        double rightFrontSpeed;
+        double leftRearSpeed;
+        double rightRearSpeed;
 
         if(!moving){
+            gyStartAngle = updateHeading();
             initialPosition = leftFront.getCurrentPosition();
             moving = true;
         }
@@ -126,10 +140,38 @@ public class Thunderbot_2021 {
             moving = false;
             return true;
 
+        } else if (currentAngle != gyStartAngle) { // Could adjust if not precise enough
+
+            // calculates required speed to adjust to gyStartAngle
+            leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightFrontSpeed = power - (currentAngle - gyStartAngle) / 100;
+            leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
+
+            // Setting range of adjustments (I may be wrong about this)
+            leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
+            rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
+            leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
+            rightRearSpeed = Range.clip(rightRearSpeed, -1, 1);
+
+            // Set new targets
+            leftFront.setPower(leftFrontSpeed);
+            leftRear.setPower(leftRearSpeed);
+            rightFront.setPower(rightFrontSpeed);
+            rightRear.setPower(rightRearSpeed);
+            return false;
+
+
         } else {
             joystickDrive(yValue, xValue, 0);
             return false;
         }
+    }
+
+    // Gets the current angle of the robot
+    public double updateHeading() {
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
     }
 
     // Stop all motors
