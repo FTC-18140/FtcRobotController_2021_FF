@@ -113,6 +113,7 @@ public class Thunderbot_2021 {
         rightRear.setPower(backRight);
     }
 
+    // Drives in a specified direction for a specified distance
     double gyStartAngle = 0;
     double initialPosition = 0;
     boolean moving = false;
@@ -126,6 +127,7 @@ public class Thunderbot_2021 {
         double leftRearSpeed;
         double rightRearSpeed;
 
+            // Set initial angle and position
         if(!moving){
             gyStartAngle = updateHeading();
             initialPosition = leftFront.getCurrentPosition();
@@ -135,11 +137,13 @@ public class Thunderbot_2021 {
         double position = abs(leftFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
 
+            // If the robot hasn't traveled specified distance keep going
         if(positionInCM >= distance){
             stop();
             moving = false;
             return true;
 
+            // If the angle is off course adjust
         } else if (currentAngle != gyStartAngle) { // Could adjust if not precise enough
 
             // calculates required speed to adjust to gyStartAngle
@@ -148,7 +152,7 @@ public class Thunderbot_2021 {
             leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
             rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
 
-            // Setting range of adjustments (I may be wrong about this)
+            // Setting range of adjustments
             leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
             rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
             leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
@@ -161,7 +165,7 @@ public class Thunderbot_2021 {
             rightRear.setPower(rightRearSpeed);
             return false;
 
-
+            // Keep moving
         } else {
             joystickDrive(yValue, xValue, 0);
             return false;
