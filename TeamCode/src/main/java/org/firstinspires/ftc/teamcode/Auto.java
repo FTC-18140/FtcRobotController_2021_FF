@@ -25,7 +25,7 @@ public class Auto extends OpMode {
         switch (state) {
             case 0: // Drive diagonal 45 degrees
             if (!done) {
-                done = robot.drive(45, 80, 0.5);
+                done = robot.drive(45, 80, 0.2);
             } else {
                 robot.stop();
                 done = false;
@@ -35,7 +35,7 @@ public class Auto extends OpMode {
 
             case 1: // Forward 30cm
                 if (!done) {
-                    done = robot.drive(0, 30, 0.5);
+                    done = robot.drive(0, 30, 0.2);
                 } else {
                     robot.stop();
                     done = false;
@@ -45,7 +45,7 @@ public class Auto extends OpMode {
 
             case 2: // Backward 30cm
                 if (!done) {
-                    done = robot.drive(0, 30, -0.5);
+                    done = robot.drive(0, 30, -0.2);
                 } else {
                     robot.stop();
                     done = false;

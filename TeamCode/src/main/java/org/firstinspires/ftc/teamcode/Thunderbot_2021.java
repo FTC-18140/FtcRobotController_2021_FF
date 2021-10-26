@@ -4,6 +4,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.toRadians;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -14,6 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 
 public class Thunderbot_2021 {
@@ -57,29 +60,51 @@ public class Thunderbot_2021 {
         hwMap = ahwMap;
         telemetry = telem;
 
+        try {
+            // Set up the parameters with which we will use our IMU. Note that integration
+            // algorithm here just reports accelerations to the logcat log; it doesn't actually
+            // provide positional information.
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+            parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+            parameters.loggingEnabled = true;
+            parameters.loggingTag = "IMU";
+            parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+            // Retrieve and initialize the IMU.
+            imu = ahwMap.get(BNO055IMU.class, "imu 1");
+            imu.initialize(parameters);
+        } catch (Exception p_exeception) {
+            telemetry.addData("imu not found in config file", 0);
+            imu = null;
+        }
+
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
         // Define & Initialize Motors
         rightFront = hwMap.dcMotor.get("rf");
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightRear = hwMap.dcMotor.get("rr");
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFront = hwMap.dcMotor.get("lf");
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftRear = hwMap.dcMotor.get("lr");
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
@@ -113,6 +138,7 @@ public class Thunderbot_2021 {
         rightRear.setPower(backRight);
     }
 
+
     // Drives in a specified direction for a specified distance
     double gyStartAngle = 0;
     double initialPosition = 0;
@@ -122,12 +148,10 @@ public class Thunderbot_2021 {
         double xValue = Math.sin(toRadians(direction)) * power;
         double yValue = Math.cos(toRadians(direction)) * power;
         double currentAngle = updateHeading();
-        double leftFrontSpeed;
-        double rightFrontSpeed;
-        double leftRearSpeed;
-        double rightRearSpeed;
+        telemetry.addData("current angle", updateHeading());
+        telemetry.update();
 
-            // Set initial angle and position
+        // Set initial angle and position
         if(!moving){
             gyStartAngle = updateHeading();
             initialPosition = leftFront.getCurrentPosition();
@@ -137,46 +161,61 @@ public class Thunderbot_2021 {
         double position = abs(leftFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
 
-            // If the robot hasn't traveled specified distance keep going
+            // calculates required speed to adjust to gyStartAngle
+            double adjust = (currentAngle - gyStartAngle) / 100;
+            // Setting range of adjustments
+            adjust = Range.clip(adjust, -1, 1);
+
+        // Stops when at the specified distance
         if(positionInCM >= distance){
             stop();
             moving = false;
             return true;
 
-            // If the angle is off course adjust
-        } else if (currentAngle != gyStartAngle) { // Could adjust if not precise enough
-
-            // calculates required speed to adjust to gyStartAngle
-            leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
-            rightFrontSpeed = power - (currentAngle - gyStartAngle) / 100;
-            leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
-            rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
-
-            // Setting range of adjustments
-            leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
-            rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
-            leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
-            rightRearSpeed = Range.clip(rightRearSpeed, -1, 1);
-
-            // Set new targets
-            leftFront.setPower(leftFrontSpeed);
-            leftRear.setPower(leftRearSpeed);
-            rightFront.setPower(rightFrontSpeed);
-            rightRear.setPower(rightRearSpeed);
-            return false;
-
-            // Keep moving
+            // Continues if not at the specified distance
         } else {
-            joystickDrive(yValue, xValue, 0);
+            joystickDrive(yValue, xValue, -adjust);
             return false;
         }
     }
+
+
+    // Turns to a specified angle using the gyro
+    double startAngle = 0;
+    double currentAngle = 0;
+    public boolean turn(double degrees, double power){
+        // Sets initial angle
+        if(!moving){
+            currentAngle = updateHeading();
+            startAngle = currentAngle;
+            moving = true;
+        }
+
+        // Updates current angle
+        currentAngle = updateHeading();
+        telemetry.addData("current angle", updateHeading());
+        telemetry.update();
+
+        // Stops turning when at the specified angle
+        if(Math.abs(currentAngle - startAngle) >= degrees){
+                stop();
+                moving = false;
+                return true;
+
+        // Continues to turn if not at the specified angle
+        }else{
+            joystickDrive(0, 0, power);
+            return false;
+        }
+    }
+
 
     // Gets the current angle of the robot
     public double updateHeading() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
     }
+
 
     // Stop all motors
     public void stop() {
