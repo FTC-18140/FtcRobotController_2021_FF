@@ -1,14 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.toRadians;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class Thunderbot_2021 {
 
+
+public class Thunderbot_2021 {
     /**
      * Public OpMode members
      */
@@ -17,11 +19,14 @@ public class Thunderbot_2021 {
     DcMotor leftRear = null;
     DcMotor rightRear = null;
 
-    static final double COUNTS_PER_MOTOR_REV = 28;
+
+    // converts inches to motor ticks
+    static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
     static final double DRIVE_GEAR_REDUCTION = 20;
-    static final double WHEEL_DIAMETER_INCHES = 4.0;
-    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double COUNTS_PER_CM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / ((WHEEL_DIAMETER_INCHES * 2.54) * 3.1415);
+    static final double WHEEL_DIAMETER_INCHES = 4.0; // For figuring circumference
+    static final double WHEEL_DIAMETER_CM = (WHEEL_DIAMETER_INCHES * 2.54);
+    static final double COUNTS_PER_CM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION)
+            / (WHEEL_DIAMETER_CM * 3.1415);
 
     /**
      * local OpMode members
@@ -68,69 +73,67 @@ public class Thunderbot_2021 {
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-
-    }
-    public void joystickDrive(double forward, double right, double clockwise) {
-        double mfrontRight = forward + clockwise + right;
-        double mfrontLeft = forward - clockwise - right;
-        double mbackLeft = forward + clockwise - right;
-        double mbackRight = forward - clockwise + right;
-
-        double max = abs(mfrontLeft);
-        if (abs(mfrontRight) > max) {
-            max = abs(mfrontRight);
-        }
-        if (abs(mbackLeft) > max) {
-            max = abs(mbackLeft);
-        }
-
-        if (abs(mbackRight) > max) {
-            max = abs(mbackRight);
-        }
-       if (max > 1) {
-            mfrontLeft /= max;
-            mfrontRight /= max;
-            mbackLeft /= max;
-            mbackRight /= max;
-        }
-
-       rightFront.setPower(-mfrontRight);
-       leftFront.setPower(-mfrontLeft);
-       rightRear.setPower(-mbackRight);
-       leftRear.setPower(-mbackLeft);
-
     }
 
-    double initialPos = 0;
+
+    public void joystickDrive (double foward, double right, double clockwise){
+        double frontLeft = foward + clockwise + right;
+        double frontRight = foward - clockwise - right;
+        double backLeft = foward + clockwise - right;
+        double backRight = foward - clockwise + right;
+
+        double max = abs(frontLeft);
+        if (abs(frontRight) > max){
+            max = abs(frontRight);
+        }
+        if (abs(backLeft) > max){
+            max = abs(backLeft);
+        }
+        if (abs(backRight) > max){
+            max = abs(backRight);
+        }
+        if (max > 1) {
+            frontLeft /= max;
+            frontRight /= max;
+            backLeft /= max;
+            backRight /= max;
+        }
+
+        leftFront.setPower(frontLeft);
+        rightFront.setPower(frontRight);
+        leftRear.setPower(backLeft);
+        rightRear.setPower(backRight);
+    }
+
+    double initialPosition = 0;
     boolean moving = false;
-    public boolean drive(double distance, double power) {
-        if(!moving) {
-            initialPos = leftFront.getCurrentPosition();
+    public boolean drive (double distance, double power) { // add direction double use
+
+
+
+        if(!moving){
+            initialPosition = leftFront.getCurrentPosition();
             moving = true;
         }
-        double currentPosition = leftFront.getCurrentPosition();
 
-        double howFar = currentPosition - initialPos;
-        double howFarCM = howFar / COUNTS_PER_CM;
-        if (distance <= howFarCM) {
+        double position = abs(leftFront.getCurrentPosition() - initialPosition);
+        double positionInCM = position/COUNTS_PER_CM;
+        telemetry.addData("CM:,", positionInCM);
+        if(positionInCM >= distance){
             stop();
             moving = false;
             return true;
 
-        }
-        else {
-            joystickDrive(-power, 0, 0);
+        } else {
             return false;
         }
     }
+
     // Stop all motors
     public void stop() {
         leftFront.setPower(0);
         rightFront.setPower(0);
         leftRear.setPower(0);
         rightRear.setPower(0);
-        }
     }
-
-
+}
