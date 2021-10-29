@@ -109,6 +109,8 @@ public class Thunderbot_2021 {
     boolean moving = false;
     public boolean drive (double distance, double power) { // add direction double use
 
+       // double xValue = Math.sin(toRadians(direction)) * power;
+       // double yValue = Math.cos(toRadians(direction)) * power;
 
 
         if(!moving){
@@ -118,13 +120,14 @@ public class Thunderbot_2021 {
 
         double position = abs(leftFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
-        telemetry.addData("CM:,", positionInCM);
+
         if(positionInCM >= distance){
             stop();
             moving = false;
             return true;
 
         } else {
+            //joystickDrive(yValue, xValue, 0);
             return false;
         }
     }

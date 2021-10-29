@@ -4,13 +4,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous
+@Autonomous(name="AutoRyan", group="Auto")
 public class AutoRyan extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
     public void init() {
         robot.init(hardwareMap, telemetry);
-
+        telemetry.addData("Init Done: ", "yes");
     }
 
     public void start() {
