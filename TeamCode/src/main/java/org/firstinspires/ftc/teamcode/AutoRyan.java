@@ -10,19 +10,22 @@ public class AutoRyan extends OpMode {
 
     public void init() {
         robot.init(hardwareMap, telemetry);
-        telemetry.addData("Init Done: ", "yes");
+        telemetry.addData("Init Done:", "yes");
     }
 
     public void start() {
-
+        telemetry.addData("Start:", "pressed");
     }
         int state = 0;
         boolean done = false;
+
+        @Override
         public void loop () {
             switch (state) {
                 case 0:
                     if (!done) {
-                        done = robot.drive(30, 0.5);
+                        telemetry.addData("starting =", "true");
+                        done = robot.drive(0,30, -0.5);
                     } else {
                         robot.stop();
                         done = false;
@@ -32,13 +35,23 @@ public class AutoRyan extends OpMode {
 
                 case 1:
                     if (!done) {
-                        done = robot.drive(30, -0.5);
+                        done = robot.drive(0, 30, 0.5);
                     } else {
                         robot.stop();
                         done = false;
                         state++;
                     }
                     break;
+
+                case 2:
+                    if(!done) {
+                        // negative is right while positive is left
+                        done = robot.drive(-90,20,0.25);
+                    } else {
+                        robot.stop();
+                        done = false;
+                        state++;
+                    }
 
                 default:
                     break;

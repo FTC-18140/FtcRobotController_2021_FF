@@ -107,10 +107,10 @@ public class Thunderbot_2021 {
 
     double initialPosition = 0;
     boolean moving = false;
-    public boolean drive (double distance, double power) { // add direction double use
+    public boolean drive (double direction, double distance, double power) {
 
-       // double xValue = Math.sin(toRadians(direction)) * power;
-       // double yValue = Math.cos(toRadians(direction)) * power;
+       double xValue = Math.sin(toRadians(direction)) * power;
+       double yValue = Math.cos(toRadians(direction)) * power;
 
 
         if(!moving){
@@ -127,7 +127,7 @@ public class Thunderbot_2021 {
             return true;
 
         } else {
-            //joystickDrive(yValue, xValue, 0);
+            joystickDrive(yValue, xValue, 0);
             return false;
         }
     }
