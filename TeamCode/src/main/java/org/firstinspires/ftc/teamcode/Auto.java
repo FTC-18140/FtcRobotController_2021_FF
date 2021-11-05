@@ -53,6 +53,16 @@ public class Auto extends OpMode {
                 }
                 break;
 
+            case 3: // Turn 90 Degrees
+                if (!done) {
+                    done = robot.turn(-90, 0.1);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+
             default:
                 break;
         }

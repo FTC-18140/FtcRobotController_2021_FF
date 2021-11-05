@@ -53,9 +53,11 @@ public class Thunderbot_2021 {
     }
 
     /**
-     * Initialize standard Hardware interfaces
+     * Initializes the robot
+     * @param ahwMap -
+     * @param telem -
      */
-    public void init(HardwareMap ahwMap, Telemetry telem) {
+    public void init (HardwareMap ahwMap, Telemetry telem) {
         // Save reference to Hardware map
         hwMap = ahwMap;
         telemetry = telem;
@@ -108,12 +110,17 @@ public class Thunderbot_2021 {
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-
-    public void joystickDrive (double foward, double right, double clockwise){
-        double frontLeft = foward + clockwise + right;
-        double frontRight = foward - clockwise - right;
-        double backLeft = foward + clockwise - right;
-        double backRight = foward - clockwise + right;
+    /**
+     * Uses Stick Values To Move the Robot
+     * @param forward - Y-Axis Value On The Left Stick
+     * @param right - X-Axis Value On The Left Stick
+     * @param clockwise - X-Axis Value On The Right Stick
+     */
+    public void joystickDrive (double forward, double right, double clockwise){
+        double frontLeft = forward + clockwise + right;
+        double frontRight = forward - clockwise - right;
+        double backLeft = forward + clockwise - right;
+        double backRight = forward - clockwise + right;
 
         double max = abs(frontLeft);
         if (abs(frontRight) > max){
@@ -139,10 +146,17 @@ public class Thunderbot_2021 {
     }
 
 
-    // Drives in a specified direction for a specified distance
     double gyStartAngle = 0;
     double initialPosition = 0;
     boolean moving = false;
+
+    /**
+     * Drives in a specified direction for a specified distance
+     * @param direction - Direction in Degrees The Robot Will Drive
+     * @param distance - Distance The Robot Will Travel
+     * @param power - Speed The Robot Will Travel
+     * @return
+     */
     public boolean drive (double direction, double distance, double power) {
 
         double xValue = Math.sin(toRadians(direction)) * power;
@@ -180,10 +194,17 @@ public class Thunderbot_2021 {
     }
 
 
-    // Turns to a specified angle using the gyro
     double startAngle = 0;
     double currentAngle = 0;
-    public boolean turn(double degrees, double power){
+
+    /**
+     * Turns an Exact Angle in Degrees Using The Gyro
+     * @param degrees - Angle The Robot Will Turn
+     * @param power - Speed The Robot will Turn
+     * @return
+     */
+    public boolean turn (double degrees, double power){
+        power = abs(power);
         // Sets initial angle
         if(!moving){
             currentAngle = updateHeading();
@@ -196,8 +217,12 @@ public class Thunderbot_2021 {
         telemetry.addData("current angle", updateHeading());
         telemetry.update();
 
+        if (0 > degrees){
+            power = -power;
+        }
+
         // Stops turning when at the specified angle
-        if(Math.abs(currentAngle - startAngle) >= degrees){
+        if(Math.abs(currentAngle - startAngle) >= abs(degrees)){
                 stop();
                 moving = false;
                 return true;
