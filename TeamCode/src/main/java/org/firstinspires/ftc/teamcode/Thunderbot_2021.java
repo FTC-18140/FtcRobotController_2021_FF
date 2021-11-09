@@ -159,6 +159,9 @@ public class Thunderbot_2021 {
      */
     public boolean drive (double direction, double distance, double power) {
 
+        // can it go diagonal left
+        // 360 or 180 -180
+        
         double xValue = Math.sin(toRadians(direction)) * power;
         double yValue = Math.cos(toRadians(direction)) * power;
         double currentAngle = updateHeading();
@@ -219,6 +222,12 @@ public class Thunderbot_2021 {
 
         if (0 > degrees){
             power = -power;
+        }
+
+        // what happens if above 180
+
+        if (abs(degrees) == 180){
+            // avoid 180 somehow
         }
 
         // Stops turning when at the specified angle
