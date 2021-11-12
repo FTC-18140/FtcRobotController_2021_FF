@@ -161,7 +161,7 @@ public class Thunderbot_2021 {
 
         // can it go diagonal left
         // 360 or 180 -180
-        
+   
         double xValue = Math.sin(toRadians(direction)) * power;
         double yValue = Math.cos(toRadians(direction)) * power;
         double currentAngle = updateHeading();
