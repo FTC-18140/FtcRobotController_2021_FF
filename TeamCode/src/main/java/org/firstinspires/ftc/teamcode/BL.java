@@ -27,7 +27,7 @@ public class BL extends LinearOpMode {
         robot.lineFollowRight(300, 10, 0.4); // Line follow until the robot is in the position to shoot
 
         sleep(2000); // Wait 2 secs to allow the rings to reach full power
-        robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
+        robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings; One ring to rule them all.
         robot.shooterServo2.setPower(-1.0);
         robot.rampIntakeServo.setPower(-0.5);
         sleep(1000); // Wait 3 secs to allow all the rings to fire
