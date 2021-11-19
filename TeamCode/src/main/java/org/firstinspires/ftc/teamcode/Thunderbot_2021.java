@@ -243,6 +243,20 @@ public class Thunderbot_2021 {
         }
     }
 
+    /**
+     * OnShape measurement
+     * 
+     * metal piece
+     * w - 40.7mm
+     * l - 47.3mm
+     * thicc - 2.2mm
+     *
+     * cam base
+     * top w - 40.2mm
+     * bot w - 43.4
+     * l - 52.5
+     * thicc - 10.4
+     */
 
     // Gets the current angle of the robot
     public double updateHeading() {
