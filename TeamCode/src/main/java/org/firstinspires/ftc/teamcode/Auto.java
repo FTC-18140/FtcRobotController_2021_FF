@@ -8,9 +8,18 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 //@Disabled
 public class Auto extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
+    int barcode = 1;
 
     public void init() {
         robot.init(hardwareMap,telemetry);
+
+    }
+
+    @Override
+    public void init_loop()
+    {
+        super.init_loop();
+        barcode = robot.getBarcode();
 
     }
 

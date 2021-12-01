@@ -30,6 +30,7 @@ public class Thunderbot_2021 {
 
     BNO055IMU imu = null;
 
+    Vision theCamera = null;
 
     // converts inches to motor ticks
     static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
@@ -108,6 +109,8 @@ public class Thunderbot_2021 {
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        theCamera.init(ahwMap, telem);
     }
 
     /**
@@ -257,6 +260,11 @@ public class Thunderbot_2021 {
      * l - 52.5
      * thicc - 10.4
      */
+
+    public int getBarcode()
+    {
+        return theCamera.getBarcode();
+    }
 
     // Gets the current angle of the robot
     public double updateHeading() {
