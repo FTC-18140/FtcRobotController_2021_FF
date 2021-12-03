@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.toIntExact;
 import static java.lang.Math.toRadians;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -28,8 +31,11 @@ public class Thunderbot_2021 {
     DcMotor leftRear = null;
     DcMotor rightRear = null;
 
+    CRServo carouselS = null;
+
     BNO055IMU imu = null;
 
+    public ElapsedTime mRuntime = new ElapsedTime();
 
     // converts inches to motor ticks
     static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
@@ -108,6 +114,8 @@ public class Thunderbot_2021 {
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        carouselS = hwMap.crservo.get("cs");
     }
 
     /**
@@ -243,6 +251,29 @@ public class Thunderbot_2021 {
         }
     }
 
+    /**
+     * Spins The Carousel
+     * @param power - The Speed That The Carousel
+     */
+    public boolean carousel (double time, double power) {
+        double currentTime = mRuntime.time();
+        double runTime = 0;
+        if (!moving) {
+            runTime = mRuntime.time() - time;
+            moving = true;
+        }
+
+        if (currentTime <= runTime) {
+            carouselS.setPower(power);
+
+
+            return true;
+        }
+
+        else {
+            return false;
+        }
+    }
 
     // Gets the current angle of the robot
     public double updateHeading() {

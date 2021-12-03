@@ -23,7 +23,11 @@ public class  Teleop2 extends OpMode {
 
     public void loop() {
     robot.joystickDrive(-gamepad1.left_stick_y,gamepad1.left_stick_x,gamepad1.right_stick_x);
-
+if (gamepad1.dpad_down){
+    robot.carouselS.setPower(1.0);
+} else {
+    robot.carouselS.setPower(0);
+}
         telemetry.addData("lx: ", gamepad1.left_stick_x);
         telemetry.addData("ly: ", gamepad1.left_stick_y);
         telemetry.addData("rx: ", gamepad1.right_stick_x);
