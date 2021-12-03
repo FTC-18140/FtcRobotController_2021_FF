@@ -139,7 +139,8 @@ public class Thunderbot_2021 {
         }
     }
 
-    public boolean linear(double distance, double power) {
+    public boolean linear(double distance2, double power2) {
+        
         if (!moving) {
             initial = LinearSlide.getCurrentPosition();
 
@@ -149,7 +150,7 @@ public class Thunderbot_2021 {
         double position2 = abs(LinearSlide.getCurrentPosition() - initial);
         double positionInCM2 = position2 / COUNTS_PER_CM;
 
-        if (positionInCM2 >= distance) {
+        if (positionInCM2 >= distance2) {
             stop();
             moving = false;
             return true;
