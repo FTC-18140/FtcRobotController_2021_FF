@@ -18,7 +18,7 @@ public class Thunderbot_2021 {
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
-    DcMotor LinearSlide = null;
+    DcMotor linearSlide = null;
 
 
     // converts inches to motor ticks
@@ -75,11 +75,11 @@ public class Thunderbot_2021 {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        LinearSlide = hwMap.dcMotor.get("LinearSlide");
-        LinearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        LinearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LinearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
-        LinearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearSlide = hwMap.dcMotor.get("LinearSlide");
+        linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        linearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+        linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
 
@@ -139,25 +139,28 @@ public class Thunderbot_2021 {
         }
     }
 
-    public boolean linear(double distance2, double power2) {
+    public boolean linear(double distance, double power) {
         
         if (!moving) {
-            initial = LinearSlide.getCurrentPosition();
+            initial = linearSlide.getCurrentPosition();
 
             moving = true;
         }
-
-        double position2 = abs(LinearSlide.getCurrentPosition() - initial);
+        double position2 = abs(linearSlide.getCurrentPosition() - initial);
         double positionInCM2 = position2 / COUNTS_PER_CM;
 
-        if (positionInCM2 >= distance2) {
+        if (positionInCM2 >= distance) {
             stop();
             moving = false;
             return true;
 
+        } else {
+            linearSlide.setPower(power);
+            return true;
         }
-        return true;
+
     }
+
     // Stop all motors
     public void stop() {
         leftFront.setPower(0);
