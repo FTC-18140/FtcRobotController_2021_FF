@@ -13,7 +13,7 @@ public class LinearSlideTest extends OpMode {
     }
 
     public void start() {
-
+    telemetry.addData("Starting", "...");
     }
     int state = 0;
     boolean done = false;
@@ -33,7 +33,14 @@ public class LinearSlideTest extends OpMode {
                             state++;
                         }
                         break;
-
+                    case 1:
+                        if(!done) {
+                            done = robot.linear(10, 0.5);
+                        } else {
+                            robot.stop();
+                            done = false;
+                            state++;
+                        }
                     default:
                         break;
             }

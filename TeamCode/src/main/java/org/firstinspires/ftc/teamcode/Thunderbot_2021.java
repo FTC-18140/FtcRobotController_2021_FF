@@ -19,6 +19,7 @@ public class Thunderbot_2021 {
     DcMotor leftRear = null;
     DcMotor rightRear = null;
     DcMotor linearSlide = null;
+    DcMotor armMotor = null;
 
 
     // converts inches to motor ticks
@@ -80,6 +81,12 @@ public class Thunderbot_2021 {
         linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
         linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        armMotor = hwMap.dcMotor.get("armMotor");
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
 
@@ -159,6 +166,25 @@ public class Thunderbot_2021 {
             return true;
         }
 
+    }
+    public boolean arm(double distance, double power) {
+
+        if(!moving) {
+            initial = armMotor.getCurrentPosition();
+
+            moving = true;
+        }
+        double position3 = abs(armMotor.getCurrentPosition() - initial);
+        double positionInCM3 = position3 / COUNTS_PER_CM;
+
+        if (positionInCM3 >= distance) {
+            stop();
+            moving = false;
+            return true;
+        } else {
+            armMotor.setPower(power);
+            return true;
+        }
     }
 
     // Stop all motors

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import static java.lang.Math.abs;
@@ -16,8 +15,7 @@ public class Teleop2 extends OpMode {
         telemetry.addData("Init", "Done");
     }
     public void start() {
-
-
+        telemetry.addData("Starting", "...");
         }
     @Override
     public void loop() {
@@ -29,10 +27,18 @@ public class Teleop2 extends OpMode {
         telemetry.addData("ry", gamepad1.right_stick_y);
 
         robot.linearSlide.setPower(gamepad1.right_trigger);
+        robot.linearSlide.setPower(-gamepad1.left_trigger);
 
         telemetry.addData("LinearP", gamepad1.right_trigger);
         telemetry.addData("LinearN", -gamepad1.left_trigger);
 
+        if(gamepad1.a = true) {
+            robot.armMotor.setPower(0.5);
+        } else if (gamepad1.b = true) {
+            robot.armMotor.setPower(-0.5);
+        } else {
+            stop();
+        }
 //        telemetry.update();
     }
 
