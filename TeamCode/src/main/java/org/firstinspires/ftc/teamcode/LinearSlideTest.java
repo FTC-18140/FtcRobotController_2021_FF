@@ -9,7 +9,8 @@ public class LinearSlideTest extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
     public void init() {
-    telemetry.addData("Init =", " Done");
+        robot.init(hardwareMap, telemetry);
+        telemetry.addData("Init =", " Done");
     }
 
     public void start() {
@@ -26,7 +27,7 @@ public class LinearSlideTest extends OpMode {
                     case 0:
                         if (!done) {
                             telemetry.addData("starting =", "true");
-                            done = robot.linear(10,-0.5);
+                            done = robot.theLift.move(10,-0.5);
                         } else {
                             robot.stop();
                             done = false;

@@ -18,8 +18,11 @@ public class Thunderbot_2021 {
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
-    DcMotor LinearSlide = null;
 
+    /**
+     * The lift which uses a linear slide to move the basket up to the correct height.
+     */
+    Lift theLift;
 
     // converts inches to motor ticks
     static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
@@ -75,11 +78,7 @@ public class Thunderbot_2021 {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        LinearSlide = hwMap.dcMotor.get("LinearSlide");
-        LinearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        LinearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LinearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
-        LinearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        theLift.init(ahwMap, telem);
     }
 
 
@@ -139,30 +138,12 @@ public class Thunderbot_2021 {
         }
     }
 
-    public boolean linear(double distance2, double power2) {
-        
-        if (!moving) {
-            initial = LinearSlide.getCurrentPosition();
-
-            moving = true;
-        }
-
-        double position2 = abs(LinearSlide.getCurrentPosition() - initial);
-        double positionInCM2 = position2 / COUNTS_PER_CM;
-
-        if (positionInCM2 >= distance2) {
-            stop();
-            moving = false;
-            return true;
-
-        }
-        return true;
-    }
     // Stop all motors
     public void stop() {
         leftFront.setPower(0);
         rightFront.setPower(0);
         leftRear.setPower(0);
         rightRear.setPower(0);
+        theLift.stop();
     }
 }
