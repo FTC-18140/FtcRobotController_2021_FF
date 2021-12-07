@@ -1,14 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import static org.openftc.easyopencv.OpenCvCameraRotation.UPRIGHT;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvInternalCamera;
 
 @Autonomous(name="Auto", group="Auto")
 //@Disabled
 public class Auto extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
     int barcode = 1;
+    OpenCvCamera webcam;
 
     public void init() {
         robot.init(hardwareMap,telemetry);
@@ -20,6 +27,15 @@ public class Auto extends OpMode {
     {
         super.init_loop();
         barcode = robot.getBarcode();
+
+        int cameraMonitorView = hardwareMap.appContext.getResources().getIdentifier
+                ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createInternalCamera
+                (OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorView);
+
+        Vision detector = new Vision(telemetry);
+        webcam.setPipeline(detector);
+        webcam.openCameraDeviceAsync(() -> webcam.startStreaming(320, 240, UPRIGHT));
 
     }
 
