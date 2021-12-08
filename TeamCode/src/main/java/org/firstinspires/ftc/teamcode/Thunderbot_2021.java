@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import com.qualcomm.robotcore.hardware.Servo;
 
 
 public class Thunderbot_2021 {
@@ -19,7 +18,7 @@ public class Thunderbot_2021 {
     DcMotor leftRear = null;
     DcMotor rightRear = null;
     DcMotor linearSlide = null;
-    DcMotor armMotor = null;
+   // DcMotor armMotor = null;
 
 
     // converts inches to motor ticks
@@ -76,17 +75,18 @@ public class Thunderbot_2021 {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        linearSlide = hwMap.dcMotor.get("LinearSlide");
+        linearSlide = hwMap.dcMotor.get("linearSlide");
         linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
         linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        armMotor = hwMap.dcMotor.get("armMotor");
+        /*armMotor = hwMap.dcMotor.get("armMotor");
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    */
     }
 
 
@@ -135,7 +135,7 @@ public class Thunderbot_2021 {
         double position = abs(leftFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
 
-        if(positionInCM >= distance){
+        if(positionInCM >= distance) {
             stop();
             moving = false;
             return true;
@@ -153,21 +153,21 @@ public class Thunderbot_2021 {
 
             moving = true;
         }
-        double position2 = abs(linearSlide.getCurrentPosition() - initial);
+       double position2 = abs(linearSlide.getCurrentPosition() - initial);
         double positionInCM2 = position2 / COUNTS_PER_CM;
 
         if (positionInCM2 >= distance) {
             stop();
             moving = false;
-            return true;
 
         } else {
             linearSlide.setPower(power);
-            return true;
         }
+        return true;
 
     }
-    public boolean arm(double distance, double power) {
+    /*
+    public void arm(double distance, double power) {
 
         if(!moving) {
             initial = armMotor.getCurrentPosition();
@@ -180,15 +180,15 @@ public class Thunderbot_2021 {
         if (positionInCM3 >= distance) {
             stop();
             moving = false;
-            return true;
         } else {
             armMotor.setPower(power);
-            return true;
         }
     }
+*/
 
     // Stop all motors
     public void stop() {
+      //  linearSlide.setPower(0);
         leftFront.setPower(0);
         rightFront.setPower(0);
         leftRear.setPower(0);

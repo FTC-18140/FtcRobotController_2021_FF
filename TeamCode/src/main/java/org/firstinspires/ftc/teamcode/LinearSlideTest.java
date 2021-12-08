@@ -26,7 +26,7 @@ public class LinearSlideTest extends OpMode {
                     case 0:
                         if (!done) {
                             telemetry.addData("starting =", "true");
-                            done = robot.linear(10,-0.5);
+                           done = robot.linear(10,-0.5);
                         } else {
                             robot.stop();
                             done = false;

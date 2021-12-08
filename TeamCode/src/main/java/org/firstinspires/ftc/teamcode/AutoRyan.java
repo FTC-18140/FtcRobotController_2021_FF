@@ -36,7 +36,10 @@ public class AutoRyan extends OpMode {
                 case 1:
                     if (!done) {
                         done = robot.drive(0, 30, 0.5);
-                        robot.linear(30, 0.5);
+                       robot.linear(30, 0.5);
+                       robot.linear(30, -0.5);
+                     //   robot.arm(30, 0.5);
+                      //robot.arm(30, -0.5);
                     } else {
                         robot.stop();
                         done = false;
@@ -44,20 +47,6 @@ public class AutoRyan extends OpMode {
                     }
                     break;
 
-                case 2:
-                    if(!done) {
-                        // negative is right while positive is left
-                        done = robot.linear(30,-0.5);
-                    } else {
-                        robot.stop();
-                        done = false;
-                        state++;
-                    }
-                case 3:
-                    if(!done) {
-                        done = robot.arm(30, 0.5);
-                        robot.arm(30, -0.5);
-                    }
                 default:
                     break;
             }
