@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Math.abs;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -7,9 +9,17 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class LinearSlide {
+    Thunderbot_2021 robot = new Thunderbot_2021();
     DcMotor linearSlideR = null;
     DcMotor linearSlideL = null;
     HardwareMap hwMap = null;
+
+    static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
+    static final double DRIVE_GEAR_REDUCTION = 20;
+    static final double WHEEL_DIAMETER_INCHES = 4.0; // For figuring circumference
+    static final double WHEEL_DIAMETER_CM = (WHEEL_DIAMETER_INCHES * 2.54);
+    static final double COUNTS_PER_CM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION)
+            / (WHEEL_DIAMETER_CM * 3.1415);
 
     private Telemetry telemetry;
 
@@ -30,8 +40,30 @@ public class LinearSlide {
         linearSlideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
-    public void extend(double power) {
+
+    double initial = 0;
+    boolean moving = false;
+
+    public void extend(double distance, double power) {
         linearSlideL.setPower(power);
-        LinearSlideR.setPower(power);
+        linearSlideR.setPower(power);
+
+        if (!moving) {
+            initial = linearSlideR.getCurrentPosition();
+
+            moving = true;
+        }
+        double position3 = abs(linearSlideR.getCurrentPosition() - initial);
+        double positionInCM3 = position3 / COUNTS_PER_CM;
+
+        if (positionInCM3 >= distance) {
+            stopExtend();
+            moving = false;
+
+        }
     }
-}
+        public void stopExtend () {
+            linearSlideL.setPower(0);
+            linearSlideR.setPower(0);
+        }
+    }

@@ -36,9 +36,9 @@ public class AutoRyan extends OpMode {
                 case 1:
                     if (!done) {
                         done = robot.drive(0, 30, 0.5);
-                       robot.linear(30, 0.5);
-                       robot.linear(30, -0.5);
-                     //   robot.arm(30, 0.5);
+                       robot.linear.extend(60, 1);
+                       robot.linear.extend(0, -1 );
+                      //robot.arm(30, 0.5);
                       //robot.arm(30, -0.5);
                     } else {
                         robot.stop();
