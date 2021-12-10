@@ -31,8 +31,8 @@ public class Thunderbot_2021 {
     DcMotor leftRear = null;
     DcMotor rightRear = null;
 
-    CRServo carouselRight = null;
-    CRServo carouselLeft = null;
+    public Carousel carousel = new Carousel();
+
 
     BNO055IMU imu = null;
 
@@ -116,8 +116,7 @@ public class Thunderbot_2021 {
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        carouselRight = hwMap.crservo.get("cr");
-        carouselLeft = hwMap.crservo.get("cl");
+
     }
 
     /**
@@ -252,47 +251,6 @@ public class Thunderbot_2021 {
             return false;
         }
     }
-
-    /**
-     * Spins The Carousel
-     * @param power - The Speed That The Carousel
-     */
-    /*
-    public boolean carousel (String sides, String rotation, double time, double power) {
-        double currentTime = mRuntime.time();
-        double runTime = 0;
-        if (sides == "left") {
-            if (!moving) {
-                runTime = mRuntime.time() - time;
-                moving = true;
-            }
-
-            if (currentTime <= runTime) {
-                carouselRight.setPower(power);
-
-                return true;
-            }
-        }
-        if (sides == "right") {
-            if (!moving) {
-                runTime = mRuntime.time() - time;
-                moving = true;
-            }
-            if (currentTime <= runTime) {
-                carouselLeft.setPower(power);
-                return true;
-            }
-
-        } else {
-            return false;
-        }
-        return false;
-    }
-*/
-
-
-
-
 
     // Gets the current angle of the robot
     public double updateHeading() {
