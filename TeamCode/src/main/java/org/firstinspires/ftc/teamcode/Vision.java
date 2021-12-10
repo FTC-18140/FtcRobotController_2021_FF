@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -10,11 +12,20 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class Vision
 {
 
+
+
+// understand process frame method
+
+
+    
     /**
      * The webcam object which will grab the frames for us
      */
@@ -41,7 +52,27 @@ public class Vision
     {
         // Save reference to telemetry object
         telemetry = telem;
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
+        stageSwitchingPipeline = new StageSwitchingPipeline();
+        webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                webCam.setPipeline(stageSwitchingPipeline);
+                webCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+                /*
+                 * This will be called if the camera could not be opened
+                 */
+            }
+        });
         /*
          * Look at the examples from EasyOpenCV and copy all the relevant initialization code here.
          */
@@ -70,6 +101,7 @@ public class Vision
     {
         int pipelineBarcode = 1;
         Mat mat = new Mat();
+        Telemetry telemetry;
 
         public enum Location {
             LEFT,
@@ -101,7 +133,7 @@ public class Vision
         public Mat processFrame(Mat input)
         {
             Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV); // can convert to YUV rather than RGB for better object detection
-            return input;
+           // return input;
 
             /**
              * Scaler creates target range of color
@@ -109,7 +141,7 @@ public class Vision
              * Y represents Saturation
              * Z represents a range of values
              */
-            Scalar lowHSV = new Scalar(23, 50, 70);
+            Scalar lowHSV =  new Scalar(23, 50, 70);
             Scalar highHSV = new Scalar(32, 255, 255);
             // variables for yellow
 
@@ -126,22 +158,22 @@ public class Vision
 
             telemetry.addData("Left raw value", (int) Core.sumElems(left).val[0]);
             telemetry.addData("Right raw value", (int) Core.sumElems(right).val[0]);
-            telemetry.addData("Left percentage", value:Math.round(leftValue * 100) + "%");
-            telemetry.addData("Right percentage", value:Math.round(rightValue * 100) + "%");
+            telemetry.addData("Left percentage", Math.round(leftValue * 100) + "%");
+            telemetry.addData("Right percentage", Math.round(rightValue * 100) + "%");
 
             boolean  objLeft = leftValue > PERCENT_COLOR_THRESHOLD;
             boolean objRight = rightValue > PERCENT_COLOR_THRESHOLD;
 
             if(objLeft && objRight){
                 location = Location.NOT_FOUND;
-                teltmetry.addData("Object Location", "not found");
+                telemetry.addData("Object Location", "not found");
             }
             else if(objLeft){
                 location = Location.RIGHT;
-                teltmetry.addData("Object Location", "right");
+                telemetry.addData("Object Location", "right");
             } else{
               location = Location.LEFT;
-                teltmetry.addData("Object Location", "left");
+                telemetry.addData("Object Location", "left");
             }
             telemetry.update();
 

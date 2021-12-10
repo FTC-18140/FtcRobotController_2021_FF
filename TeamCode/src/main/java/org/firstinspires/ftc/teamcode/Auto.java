@@ -15,10 +15,12 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 public class Auto extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
     int barcode = 1;
-    OpenCvCamera webcam;
+    Vision detector = new Vision();
+
 
     public void init() {
         robot.init(hardwareMap,telemetry);
+        detector.init(hardwareMap,telemetry);
 
     }
 
@@ -27,16 +29,6 @@ public class Auto extends OpMode {
     {
         super.init_loop();
         barcode = robot.getBarcode();
-
-        int cameraMonitorView = hardwareMap.appContext.getResources().getIdentifier
-                ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createInternalCamera
-                (OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorView);
-
-        Vision detector = new Vision(telemetry);
-        webcam.setPipeline(detector);
-        webcam.openCameraDeviceAsync(() -> webcam.startStreaming(320, 240, UPRIGHT));
-
     }
 
     public void start(){
