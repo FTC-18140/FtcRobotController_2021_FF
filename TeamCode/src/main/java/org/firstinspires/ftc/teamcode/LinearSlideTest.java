@@ -4,12 +4,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name = "LinearSlideRyan", group = "Auto")
+@Autonomous(name = "LinearSlideTest", group = "Auto")
 public class LinearSlideTest extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
     public void init() {
     telemetry.addData("Init =", " Done");
+    robot.init(hardwareMap, telemetry);
     }
 
     public void start() {

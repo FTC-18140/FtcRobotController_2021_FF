@@ -17,7 +17,8 @@ public class Thunderbot_2021 {
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
-    DcMotor linearSlide = null;
+    LinearSlide linear = new LinearSlide();
+    CarouselRyan carousel = new CarouselRyan();
    // DcMotor armMotor = null;
 
 
@@ -75,11 +76,9 @@ public class Thunderbot_2021 {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        linearSlide = hwMap.dcMotor.get("linearSlide");
-        linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        linearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
-        linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linear.init(hwMap, telemetry);
+
+        carousel.init(hwMap, telemetry);
 
         /*armMotor = hwMap.dcMotor.get("armMotor");
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -135,7 +134,7 @@ public class Thunderbot_2021 {
         double position = abs(leftFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
 
-        if(positionInCM >= distance) {
+        if(positionInCM >= distance){
             stop();
             moving = false;
             return true;
@@ -146,26 +145,6 @@ public class Thunderbot_2021 {
         }
     }
 
-    public boolean linear(double distance, double power) {
-        
-        if (!moving) {
-            initial = linearSlide.getCurrentPosition();
-
-            moving = true;
-        }
-       double position2 = abs(linearSlide.getCurrentPosition() - initial);
-        double positionInCM2 = position2 / COUNTS_PER_CM;
-
-        if (positionInCM2 >= distance) {
-            stop();
-            moving = false;
-
-        } else {
-            linearSlide.setPower(power);
-        }
-        return true;
-
-    }
     /*
     public void arm(double distance, double power) {
 
@@ -188,7 +167,6 @@ public class Thunderbot_2021 {
 
     // Stop all motors
     public void stop() {
-      //  linearSlide.setPower(0);
         leftFront.setPower(0);
         rightFront.setPower(0);
         leftRear.setPower(0);
