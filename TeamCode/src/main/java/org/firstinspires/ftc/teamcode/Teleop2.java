@@ -26,12 +26,18 @@ public class Teleop2 extends OpMode {
         telemetry.addData("ly", gamepad1.left_stick_y);
         telemetry.addData("rx", gamepad1.right_stick_x);
         telemetry.addData("ry", gamepad1.right_stick_y);
-        // above is the code for the basic motors
-        robot.linear.extend(20, -gamepad1.right_trigger);
-        robot.linear.extend(0, gamepad1.left_trigger);
+        // above is the code for the basic motor
+
         // code for the linear slide
+        robot.linear.extend(0, gamepad1.left_trigger);
+        if (gamepad1.a && gamepad1.b) {
+            robot.linear.extend(-20, -1);
+        } else {
+            robot.linear.stopExtend();
+        }
         telemetry.addData("LinearP", gamepad1.right_trigger);
         telemetry.addData("LinearN", -gamepad1.left_trigger);
+        // below is the code for the carousel
         if (gamepad1.right_bumper) {
             robot.carousel.spin(1);
         } else {

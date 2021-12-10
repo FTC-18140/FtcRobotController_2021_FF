@@ -19,6 +19,7 @@ public class Thunderbot_2021 {
     DcMotor rightRear = null;
     LinearSlide linear = new LinearSlide();
     CarouselRyan carousel = new CarouselRyan();
+    armMotor arm = new armMotor();
    // DcMotor armMotor = null;
 
 
@@ -80,15 +81,8 @@ public class Thunderbot_2021 {
 
         carousel.init(hwMap, telemetry);
 
-        /*armMotor = hwMap.dcMotor.get("armMotor");
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    */
+        arm.init(hwMap, telemetry);
     }
-
-
     public void joystickDrive (double foward, double right, double clockwise){
         double frontLeft = foward + clockwise + right;
         double frontRight = foward - clockwise - right;
@@ -144,26 +138,6 @@ public class Thunderbot_2021 {
             return false;
         }
     }
-
-    /*
-    public void arm(double distance, double power) {
-
-        if(!moving) {
-            initial = armMotor.getCurrentPosition();
-
-            moving = true;
-        }
-        double position3 = abs(armMotor.getCurrentPosition() - initial);
-        double positionInCM3 = position3 / COUNTS_PER_CM;
-
-        if (positionInCM3 >= distance) {
-            stop();
-            moving = false;
-        } else {
-            armMotor.setPower(power);
-        }
-    }
-*/
 
     // Stop all motors
     public void stop() {
