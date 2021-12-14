@@ -17,6 +17,7 @@ public class Thunderbot_2021 {
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
+    // pulling in the other areas
     LinearSlide linear = new LinearSlide();
     CarouselRyan carousel = new CarouselRyan();
     armMotor arm = new armMotor();
@@ -70,6 +71,7 @@ public class Thunderbot_2021 {
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         leftRear = hwMap.dcMotor.get("lr");
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

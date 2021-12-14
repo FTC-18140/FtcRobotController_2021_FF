@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import static java.lang.Math.abs;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class armMotor {
+    Servo leftClaw = null;
+    Servo rightClaw = null;
     DcMotor armMotor = null;
     HardwareMap hwMap = null;
 
@@ -29,13 +31,16 @@ public class armMotor {
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftClaw = hwMap.servo.get("lc");
+        rightClaw = hwMap.servo.get("rc");
     }
     boolean moving = false;
     double initial = 0;
-        public void lift(double distance, double power) {
+        public void lift(double power) {
             armMotor.setPower(power);
-
-            if (!moving) {
+        }
+           /*if (!moving) {
                 initial = armMotor.getCurrentPosition();
 
                 moving = true;
@@ -47,11 +52,17 @@ public class armMotor {
             stopLift();
             }
         }
+        */
         public void stopLift() {
             armMotor.setPower(0);
         }
         public void close() {
-
+            leftClaw.setPosition(0);
+            rightClaw.setPosition(0);
+        }
+        public void open() {
+            leftClaw.setPosition(0.5);
+            rightClaw.setPosition(-0.5);
         }
     }
 
