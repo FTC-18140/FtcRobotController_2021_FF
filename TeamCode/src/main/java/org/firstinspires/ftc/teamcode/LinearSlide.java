@@ -5,12 +5,15 @@ import static java.lang.Math.abs;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class LinearSlide {
     DcMotor linearSlideR = null;
     DcMotor linearSlideL = null;
+    Servo linearSlideServoL = null;
+    Servo linearSlideServoR = null;
     HardwareMap hwMap = null;
 
     static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
@@ -38,8 +41,9 @@ public class LinearSlide {
         linearSlideL.setDirection(DcMotorSimple.Direction.FORWARD);
         linearSlideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        linearSlideServoL = hwMap.servo.get("lssl");
+        linearSlideServoR = hwMap.servo.get("lssr");
     }
-
     double initial = 0;
     boolean moving = false;
 
@@ -64,5 +68,17 @@ public class LinearSlide {
         public void stopExtend () {
             linearSlideL.setPower(0);
             linearSlideR.setPower(0);
+        }
+        public void servoTurn() {
+            linearSlideServoL.setPosition(0.75);
+            linearSlideServoR.setPosition(0.75);
+        }
+        public void negativeServoTurn() {
+        linearSlideServoL.setPosition(-0.75);
+        linearSlideServoR.setPosition(-0.75);
+    }
+        public void servoEase() {
+            linearSlideServoL.setPosition(0.1);
+            linearSlideServoR.setPosition(0.1);
         }
     }

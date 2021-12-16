@@ -21,6 +21,7 @@ public class Thunderbot_2021 {
     LinearSlide linear = new LinearSlide();
     CarouselRyan carousel = new CarouselRyan();
     armMotor arm = new armMotor();
+    intake intake = new intake();
    // DcMotor armMotor = null;
 
 
@@ -84,6 +85,8 @@ public class Thunderbot_2021 {
         carousel.init(hwMap, telemetry);
 
         arm.init(hwMap, telemetry);
+
+        intake.init(hwMap, telemetry);
     }
     public void joystickDrive (double foward, double right, double clockwise){
         double frontLeft = foward + clockwise + right;

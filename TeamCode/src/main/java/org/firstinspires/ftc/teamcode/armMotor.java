@@ -40,7 +40,8 @@ public class armMotor {
         public void lift(double power) {
             armMotor.setPower(power);
         }
-           /*if (!moving) {
+           /*
+           if (!moving) {
                 initial = armMotor.getCurrentPosition();
 
                 moving = true;
@@ -57,12 +58,12 @@ public class armMotor {
             armMotor.setPower(0);
         }
         public void close() {
-            leftClaw.setPosition(0);
-            rightClaw.setPosition(0);
+            leftClaw.setPosition(1);
+            rightClaw.setPosition(-1);
         }
         public void open() {
-            leftClaw.setPosition(0.5);
-            rightClaw.setPosition(-0.5);
+            leftClaw.setPosition(0);
+            rightClaw.setPosition(1);
         }
     }
 
