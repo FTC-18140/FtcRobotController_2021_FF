@@ -76,7 +76,7 @@ public class Thunderbot_2021 {
             parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
             // Retrieve and initialize the IMU.
-            imu = ahwMap.get(BNO055IMU.class, "imu 1");
+            imu = ahwMap.get(BNO055IMU.class, "imu");
             imu.initialize(parameters);
         } catch (Exception p_exeception) {
             telemetry.addData("imu not found in config file", 0);
