@@ -3,16 +3,26 @@ package org.firstinspires.ftc.teamcode;
 import static java.lang.Math.abs;
 import static java.lang.Math.toRadians;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 
 
 public class Thunderbot_2021 {
     /**
      * Public OpMode members
      */
+    BNO055IMU imu = null;
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
@@ -51,6 +61,27 @@ public class Thunderbot_2021 {
      */
     public void init(HardwareMap ahwMap, Telemetry telem) {
         // Save reference to Hardware map
+        try {
+            // Set up the parameters with which we will use our IMU. Note that integration
+            // algorithm here just reports accelerations to the logcat log; it doesn't actually
+            // provide positional information.
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+            parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+            parameters.loggingEnabled = true;
+            parameters.loggingTag = "IMU";
+            parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+            // Retrieve and initialize the IMU.
+            imu = ahwMap.get(BNO055IMU.class, "imu 1");
+            imu.initialize(parameters);
+        } catch (Exception p_exeception) {
+            telemetry.addData("imu not found in config file", 0);
+            imu = null;
+        }
+
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         hwMap = ahwMap;
         telemetry = telem;
 
@@ -121,19 +152,19 @@ public class Thunderbot_2021 {
     boolean moving = false;
     public boolean drive (double direction, double distance, double power) {
 
-       double xValue = Math.sin(toRadians(direction)) * power;
-       double yValue = Math.cos(toRadians(direction)) * power;
+        double xValue = Math.sin(toRadians(direction)) * power;
+        double yValue = Math.cos(toRadians(direction)) * power;
 
 
-        if(!moving){
+        if (!moving) {
             initialPosition = leftFront.getCurrentPosition();
             moving = true;
         }
 
         double position = abs(leftFront.getCurrentPosition() - initialPosition);
-        double positionInCM = position/COUNTS_PER_CM;
+        double positionInCM = position / COUNTS_PER_CM;
 
-        if(positionInCM >= distance){
+        if (positionInCM >= distance) {
             stop();
             moving = false;
             return true;
@@ -143,6 +174,58 @@ public class Thunderbot_2021 {
             return false;
         }
     }
+        double startAngle = 0;
+        double currentAngle = 0;
+/**
+ * Turns an Exact Angle in Degrees Using The Gyro
+ * @param degrees - Angle The Robot Will Turn
+ * @param power - Speed The Robot will Turn
+ * @return
+ */
+        public boolean turn (double degrees, double power){
+            power = abs(power);
+            // Sets initial angle
+            if(!moving){
+                currentAngle = updateHeading();
+                startAngle = currentAngle;
+                moving = true;
+            }
+
+            // Updates current angle
+            currentAngle = updateHeading();
+            telemetry.addData("current angle", updateHeading());
+            telemetry.update();
+
+            if (0 > degrees){
+                power = -power;
+            }
+
+            // what happens if above 180
+
+            if (abs(degrees) == 180){
+                // avoid 180 somehow
+            }
+
+            // Stops turning when at the specified angle
+            if(Math.abs(currentAngle - startAngle) >= abs(degrees)){
+                stop();
+                moving = false;
+                return true;
+
+                // Continues to turn if not at the specified angle
+            }else{
+                joystickDrive(0, 0, power);
+                return false;
+            }
+        }
+
+
+// Gets the current angle of the robot
+        public double updateHeading() {
+            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
+        }
+
 
     // Stop all motors
     public void stop() {
