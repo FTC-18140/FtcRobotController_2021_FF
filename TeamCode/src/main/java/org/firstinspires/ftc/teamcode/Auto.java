@@ -24,22 +24,7 @@ public class Auto extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    telemetry.addData("starting =", "true");
-                    done = robot.drive(0,30, -0.5);
-                } else {
-                    robot.stop();
-                    done = false;
-                    state++;
-                }
-                break;
-
-            case 1:
-                if (!done) {
-                    done = robot.drive(0, 30, 0.5);
-                    robot.linear.extend(60, 1);
-                    robot.linear.extend(0, -1 );
-                    //robot.arm(30, 0.5);
-                    //robot.arm(30, -0.5);
+                    robot.carousel.spin(-1);
                 } else {
                     robot.stop();
                     done = false;
