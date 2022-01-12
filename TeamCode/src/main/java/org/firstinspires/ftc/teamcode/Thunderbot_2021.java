@@ -8,6 +8,8 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -32,7 +34,7 @@ public class Thunderbot_2021 {
     CarouselRyan carousel = new CarouselRyan();
     armMotor arm = new armMotor();
     intake intake = new intake();
-   // DcMotor armMotor = null;
+    // DcMotor armMotor = null;
 
 
     // converts inches to motor ticks
@@ -119,20 +121,21 @@ public class Thunderbot_2021 {
 
         intake.init(hwMap, telemetry);
     }
-    public void joystickDrive (double foward, double right, double clockwise){
+
+    public void joystickDrive(double foward, double right, double clockwise) {
         double frontLeft = foward + clockwise + right;
         double frontRight = foward - clockwise - right;
         double backLeft = foward + clockwise - right;
         double backRight = foward - clockwise + right;
 
         double max = abs(frontLeft);
-        if (abs(frontRight) > max){
+        if (abs(frontRight) > max) {
             max = abs(frontRight);
         }
-        if (abs(backLeft) > max){
+        if (abs(backLeft) > max) {
             max = abs(backLeft);
         }
-        if (abs(backRight) > max){
+        if (abs(backRight) > max) {
             max = abs(backRight);
         }
         if (max > 1) {
@@ -147,42 +150,64 @@ public class Thunderbot_2021 {
         leftRear.setPower(backLeft);
         rightRear.setPower(backRight);
     }
-    double initial = 0;
+    /**
+     * Drives in a specified direction for a specified distance
+     * @param direction - Direction in Degrees The Robot Will Drive
+     * @param distance - Distance The Robot Will Travel
+     * @param power - Speed The Robot Will Travel
+     * @return
+     */
+
+    double gyStartAngle = 0;
     double initialPosition = 0;
     boolean moving = false;
     public boolean drive (double direction, double distance, double power) {
 
+        // can it go diagonal left
+        // 360 or 180 -180
+
         double xValue = Math.sin(toRadians(direction)) * power;
         double yValue = Math.cos(toRadians(direction)) * power;
+        double currentAngle = updateHeading();
+        telemetry.addData("current angle", updateHeading());
+        telemetry.update();
 
-
-        if (!moving) {
+        // Set initial angle and position
+        if(!moving){
+            gyStartAngle = updateHeading();
             initialPosition = leftFront.getCurrentPosition();
             moving = true;
         }
 
         double position = abs(leftFront.getCurrentPosition() - initialPosition);
-        double positionInCM = position / COUNTS_PER_CM;
+        double positionInCM = position/COUNTS_PER_CM;
 
-        if (positionInCM >= distance) {
+        // calculates required speed to adjust to gyStartAngle
+        double adjust = (currentAngle - gyStartAngle) / 100;
+        // Setting range of adjustments
+        adjust = Range.clip(adjust, -1, 1);
+
+        // Stops when at the specified distance
+        if(positionInCM >= distance){
             stop();
             moving = false;
             return true;
 
+            // Continues if not at the specified distance
         } else {
-            joystickDrive(yValue, xValue, 0);
+            joystickDrive(yValue, xValue, -adjust);
             return false;
         }
     }
-        double startAngle = 0;
-        double currentAngle = 0;
+    double startAngle = 0;
+    double currentAngle = 0;
 /**
  * Turns an Exact Angle in Degrees Using The Gyro
  * @param degrees - Angle The Robot Will Turn
  * @param power - Speed The Robot will Turn
  * @return
  */
-        public boolean turn (double degrees, double power){
+        public boolean turn (double degrees, double power) {
             power = abs(power);
             // Sets initial angle
             if(!moving){
