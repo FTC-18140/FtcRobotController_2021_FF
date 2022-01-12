@@ -74,11 +74,11 @@ public class LinearSlide {
             linearSlideServoR.setPosition(0.75);
         }
         public void negativeServoTurn() {
-        linearSlideServoL.setPosition(-0.75);
-        linearSlideServoR.setPosition(-0.75);
+            linearSlideServoL.setPosition(-0.75);
+            linearSlideServoR.setPosition(-0.75);
     }
         public void servoEase() {
-            linearSlideServoL.setPosition(0.1);
-            linearSlideServoR.setPosition(0.1);
+            linearSlideServoL.setPosition(0);
+            linearSlideServoR.setPosition(0);
         }
     }

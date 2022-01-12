@@ -24,8 +24,8 @@ public class intake {
 
 
     }
-    public void intakeMove() {
-        intakeMotor.setPower(1);
+    public void intakeMove(double power) {
+        intakeMotor.setPower(power);
     }
     public void intakeStop() {
         intakeMotor.setPower(0);

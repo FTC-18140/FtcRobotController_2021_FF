@@ -30,18 +30,25 @@ public class Teleop2 extends OpMode {
 
         // above is the code for the basic motor
 
-        robot.linear.extend(100, gamepad1.right_trigger);
-        robot.linear.extend(-100, -gamepad1.left_trigger);
+        if (gamepad2.dpad_left) {
+            robot.linear.extend(30, 1);
+        } else if (gamepad2.dpad_right) {
+            robot.linear.extend(-30, -1);
+        } else {
+            robot.linear.stopExtend();
+        }
+        //robot.linear.extend(100, gamepad2.left_stick_y);
+        //robot.linear.extend(-100, -gamepad2.left_stick_y);
 
-        if (gamepad1.x) {
-            robot.intake.intakeMove();
+        if (gamepad2.x) {
+            robot.intake.intakeMove(1);
+        } else if (gamepad2.y) {
+            robot.intake.intakeMove(-1);
         } else {
             robot.intake.intakeStop();
         }
-        if(gamepad1.dpad_up) {
+        if(gamepad2.dpad_up) {
             robot.linear.servoTurn();
-        } else if (gamepad1.dpad_down) {
-            robot.linear.negativeServoTurn();
         } else {
             robot.linear.servoEase();
         }
@@ -55,7 +62,7 @@ public class Teleop2 extends OpMode {
 
         // above is the code for the arm's claws closing whenever you press and hold the left bumper
 
-        if (gamepad1.right_bumper) {
+        if (gamepad2.right_bumper) {
             robot.carousel.spin(-1);
         } else {
             robot.carousel.spinStop();
