@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class CarouselRyan {
+public class Carousel {
     CRServo leftServo = null;
     CRServo rightServo = null;
     HardwareMap hwMap = null;
@@ -17,8 +17,8 @@ public class CarouselRyan {
     private Telemetry telemetry;
 
     public void init(HardwareMap ahwMap, Telemetry telem) {
-    hwMap = ahwMap;
-    telemetry = telem;
+        hwMap = ahwMap;
+        telemetry = telem;
 
         leftServo = hwMap.crservo.get("ls");
         rightServo = hwMap.crservo.get("rs");

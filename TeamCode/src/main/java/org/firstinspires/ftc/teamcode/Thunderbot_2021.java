@@ -31,7 +31,7 @@ public class Thunderbot_2021 {
     DcMotor rightRear = null;
     // pulling in the other areas
     LinearSlide linear = new LinearSlide();
-    CarouselRyan carousel = new CarouselRyan();
+    Carousel carousel = new Carousel();
     armMotor arm = new armMotor();
     intake intake = new intake();
     // DcMotor armMotor = null;
