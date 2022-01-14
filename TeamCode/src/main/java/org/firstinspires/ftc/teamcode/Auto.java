@@ -24,12 +24,7 @@ public class Auto extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    try {
-                        robot.carousel.autoSpin(5000,-1);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
+                    done = robot.drive(115, 1.5, 0.75);
                 } else {
                     robot.stop();
                     done = false;
@@ -38,16 +33,45 @@ public class Auto extends OpMode {
                 break;
             case 1:
                 if (!done) {
-                    robot.turn(-50, 0.25);
+                    done = robot.turn(-50, 0.25);
                 } else {
+                    resetStartTime();
                     robot.stop();
                     done = false;
                     state++;
                 }
                 break;
             case 2:
+                if (getRuntime() < 10.25) {
+                    robot.carousel.autoSpin(1);
+                } else {
+                    robot.carousel.spinStop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 3:
+               if (!done) {
+                   done = robot.drive(-90, 15, 0.75);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 4:
                 if (!done) {
-                    robot.drive(0, 20, 0.75);
+                    done = robot.turn(-30, 0.25);
+                } else {
+                    resetStartTime();
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 5:
+                if (!done) {
+                    done = robot.drive(0, 275, 0.75);
                 } else {
                     robot.stop();
                     done = false;

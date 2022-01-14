@@ -22,15 +22,12 @@ public class Carousel {
         rightServo = hwMap.crservo.get("rs");
     }
     public void spin(double speed) {
-        leftServo.setPower(-speed);
-        rightServo.setPower(speed);
+        leftServo.setPower(speed);
+        rightServo.setPower(-speed);
     }
-    public void autoSpin(int time, double power) throws InterruptedException {
+    public void autoSpin(double power){
         leftServo.setPower(power);
-        rightServo.setPower(power);
-
-        sleep(time);
-
+        rightServo.setPower(-power);
     }
     public void spinStop() {
         leftServo.setPower(0);

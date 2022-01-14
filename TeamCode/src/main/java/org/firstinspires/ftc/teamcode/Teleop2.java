@@ -31,11 +31,14 @@ public class Teleop2 extends OpMode {
         // above is the code for the basic motor
 
         if (gamepad2.a) {
-            robot.linear.extend(100, 1);
+            robot.linear.linearSlideR.setPower(1);
+            robot.linear.linearSlideL.setPower(1);
         } else if (gamepad2.b) {
-            robot.linear.extend(-100, -1);
+            robot.linear.linearSlideR.setPower(-1);
+            robot.linear.linearSlideL.setPower(-1);
         } else {
-            robot.linear.stopExtend();
+            robot.linear.linearSlideR.setPower(0);
+            robot.linear.linearSlideL.setPower(0);
         }
 
 
@@ -52,7 +55,7 @@ public class Teleop2 extends OpMode {
         if(gamepad2.dpad_up) {
             robot.linear.servoTurn();
         } else {
-            robot.linear.servoEase();
+            robot.linear.servoHold();
         }
         //  above is the code that makes the linear slide extend and retract
 
