@@ -24,6 +24,7 @@ public class Thunderbot_2021 {
     /**
      * Public OpMode members
      */
+    // defines all varibles setting them to null
     BNO055IMU imu = null;
     DcMotor leftFront = null;
     DcMotor rightFront = null;
@@ -76,12 +77,14 @@ public class Thunderbot_2021 {
             parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
             // Retrieve and initialize the IMU.
-            imu = ahwMap.get(BNO055IMU.class, "imu 1");
+            imu = ahwMap.get(BNO055IMU.class, "imu");
             imu.initialize(parameters);
-        } catch (Exception p_exeception) {
-            telemetry.addData("imu not found in config file", 0);
-            imu = null;
-        }
+        } catch (Exception p_exeception)
+
+    {
+        telemetry.addData("imu not found in config file", 0);
+        imu = null;
+    }
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         hwMap = ahwMap;
@@ -113,6 +116,7 @@ public class Thunderbot_2021 {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+// Initializing all of the other classes that are used in the robot
         linear.init(hwMap, telemetry);
 
         carousel.init(hwMap, telemetry);
@@ -122,6 +126,12 @@ public class Thunderbot_2021 {
         intake.init(hwMap, telemetry);
     }
 
+    /**
+     * This code go's through the math behind the mecanum wheel drive
+     * @param foward - Any forward motion including backwards
+     * @param right - Any movement from left to right
+     * @param clockwise - Any turning movements
+     */
     public void joystickDrive(double foward, double right, double clockwise) {
         double frontLeft = foward + clockwise + right;
         double frontRight = foward - clockwise - right;

@@ -24,7 +24,30 @@ public class Auto extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    robot.carousel.spin(-1);
+                    try {
+                        robot.carousel.autoSpin(5000,-1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 1:
+                if (!done) {
+                    robot.turn(-50, 0.25);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 2:
+                if (!done) {
+                    robot.drive(0, 20, 0.75);
                 } else {
                     robot.stop();
                     done = false;

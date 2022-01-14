@@ -30,15 +30,17 @@ public class Teleop2 extends OpMode {
 
         // above is the code for the basic motor
 
-        if (gamepad2.dpad_left) {
-            robot.linear.extend(30, 1);
-        } else if (gamepad2.dpad_right) {
-            robot.linear.extend(-30, -1);
+        if (gamepad2.a) {
+            robot.linear.extend(100, 1);
+        } else if (gamepad2.b) {
+            robot.linear.extend(-100, -1);
         } else {
             robot.linear.stopExtend();
         }
-        //robot.linear.extend(100, gamepad2.left_stick_y);
-        //robot.linear.extend(-100, -gamepad2.left_stick_y);
+
+
+       // robot.linear.extend(100, gamepad2.right_trigger);
+       // robot.linear.extend(-100, -gamepad2.left_trigger);
 
         if (gamepad2.x) {
             robot.intake.intakeMove(1);

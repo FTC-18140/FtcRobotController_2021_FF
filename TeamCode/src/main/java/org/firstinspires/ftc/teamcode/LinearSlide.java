@@ -52,11 +52,11 @@ public class LinearSlide {
         linearSlideR.setPower(power);
 
         if (!moving) {
-            initial = linearSlideR.getCurrentPosition();
+            initial = linearSlideL.getCurrentPosition();
 
             moving = true;
         }
-        double position3 = abs(linearSlideR.getCurrentPosition() - initial);
+        double position3 = abs(linearSlideL.getCurrentPosition() - initial);
         double positionInCM3 = position3 / COUNTS_PER_CM;
 
         if (positionInCM3 >= distance) {
@@ -70,15 +70,19 @@ public class LinearSlide {
             linearSlideR.setPower(0);
         }
         public void servoTurn() {
-            linearSlideServoL.setPosition(0.75);
-            linearSlideServoR.setPosition(0.75);
+            linearSlideServoL.setPosition(1);
+            linearSlideServoR.setPosition(0);
         }
         public void negativeServoTurn() {
             linearSlideServoL.setPosition(-0.75);
             linearSlideServoR.setPosition(-0.75);
     }
         public void servoEase() {
-            linearSlideServoL.setPosition(0);
-            linearSlideServoR.setPosition(0);
+            linearSlideServoL.setPosition(-0.2);
+            linearSlideServoR.setPosition(0.2);
+        }
+        public void pressure() {
+        linearSlideServoL.setPosition(1);
+        linearSlideServoR.setPosition(1);
         }
     }
