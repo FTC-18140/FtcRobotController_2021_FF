@@ -44,10 +44,11 @@ public class LinearSlide {
         linearSlideServoL = hwMap.servo.get("lssl");
         linearSlideServoR = hwMap.servo.get("lssr");
     }
+
     double initial = 0;
     boolean moving = false;
 
-    public void extend(double distance, double power) {
+    public boolean extend(double distance, double power) {
         linearSlideL.setPower(power);
         linearSlideR.setPower(power);
 
@@ -60,10 +61,10 @@ public class LinearSlide {
         double positionInCM3 = position3 / COUNTS_PER_CM;
 
         if (positionInCM3 >= distance) {
-            stopExtend();
             moving = false;
-
+            return true;
         }
+        return false;
     }
         public void stopExtend () {
             linearSlideL.setPower(0);
@@ -81,6 +82,10 @@ public class LinearSlide {
             linearSlideServoL.setPosition(-0.15);
             linearSlideServoR.setPosition(0.15);
         }
+        /*public void servoStop(){
+        linearSlideServoL.setPosition(0);
+        linearSlideServoR.setPosition(0);
+        }*/
         public void pressure() {
         linearSlideServoL.setPosition(1);
         linearSlideServoR.setPosition(1);
