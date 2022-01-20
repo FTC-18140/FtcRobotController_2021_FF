@@ -30,7 +30,7 @@ public class AutoLBlue extends OpMode {
                     resetStartTime();
                     robot.stop();
                     done = false;
-                    state++;
+                    state++;   
                 }
                 break;
             case 1:

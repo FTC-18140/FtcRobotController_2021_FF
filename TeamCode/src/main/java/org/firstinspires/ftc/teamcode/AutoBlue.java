@@ -52,7 +52,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 3:
                 if (!done) {
-                    done = robot.drive(90, 35, 0.75);
+                    done = robot.drive(90, 25, 0.75);
                 } else {
                     robot.stop();
                     done = false;
@@ -61,7 +61,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 4:
                 if (!done) {
-                    done = robot.turn(47.5, 0.25);
+                    done = robot.turn(30, 0.25);
                 } else {
                     resetStartTime();
                     robot.stop();

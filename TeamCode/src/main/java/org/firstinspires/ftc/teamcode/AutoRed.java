@@ -80,7 +80,7 @@ public class AutoRed extends OpMode {
                 break;
             case 6:
                 if (!done) {
-                    done = robot.drive(0, 275, 0.75);
+                    done = robot.drive(0, 275, 0.5);
                 } else {
                     robot.stop();
                     done = false;
