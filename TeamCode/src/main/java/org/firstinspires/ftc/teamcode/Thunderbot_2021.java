@@ -123,6 +123,8 @@ public class Thunderbot_2021 {
         intake.init(hwMap, telemetry);
     }
 
+
+
     /**
      * This code go's through the math behind the mecanum wheel drive
      * @param foward - Any forward motion including backwards
@@ -170,9 +172,6 @@ public class Thunderbot_2021 {
     boolean moving = false;
     public boolean drive (double direction, double distance, double power) {
 
-        // can it go diagonal left
-        // 360 or 180 -180
-
         double xValue = Math.sin(toRadians(direction)) * power;
         double yValue = Math.cos(toRadians(direction)) * power;
         double currentAngle = updateHeading();
@@ -206,6 +205,7 @@ public class Thunderbot_2021 {
             return false;
         }
     }
+
     double startAngle = 0;
     double currentAngle = 0;
 /**
@@ -250,6 +250,88 @@ public class Thunderbot_2021 {
                 return false;
             }
         }
+
+
+        public boolean driveTo (double direction, double distance, double power){
+            double xValue = Math.sin(toRadians(direction)) * power;
+            double yValue = Math.cos(toRadians(direction)) * power;
+            double currentAngle = updateHeading();
+            telemetry.addData("current angle", updateHeading());
+            telemetry.update();
+
+            // Set initial angle and position
+            if(!moving){
+                gyStartAngle = updateHeading();
+                initialPosition = leftFront.getCurrentPosition();
+                moving = true;
+            }
+
+            double position = abs(leftFront.getCurrentPosition() - initialPosition);
+            double positionInCM = position/COUNTS_PER_CM;
+
+            // calculates required speed to adjust to gyStartAngle
+            double adjust = (currentAngle - gyStartAngle) / 100;
+            // Setting range of adjustments
+            adjust = Range.clip(adjust, -1, 1);
+
+            // Stops when at the specified distance
+            if(positionInCM >= distance){
+                stop();
+                moving = false;
+                return true;
+
+                // Continues if not at the specified distance
+            } else {
+                joystickDrive(yValue, xValue, -adjust);
+                return false;
+            }
+        }
+
+    public boolean turnTo (double degrees, double power) {
+        power = abs(power);
+
+        if(!moving){
+            moving = true;
+        }
+
+        // Updates current angle
+        currentAngle = updateHeading();
+        telemetry.addData("current angle", updateHeading());
+        telemetry.update();
+
+        if (abs(degrees) == 180){
+            // avoid 180 somehow
+        }
+
+        if (degrees - currentAngle < 0){
+            power = - power;
+        }
+
+        if(10 > (Math.abs(currentAngle) - degrees)){
+            power = power * ((Math.abs(currentAngle)-degrees)/10);
+        }
+
+        //double adjust = (currentAngle - degrees) / 100;
+        /*if (degrees - currentAngle > 0) {
+            power = Range.clip(power, 0.2, 1.0);
+        }
+
+        if (degrees - currentAngle < 0) {
+            power = Range.clip(power, -0.2, -1.0);
+        }*/
+
+        // Stops turning when at the specified angle
+        if(Math.abs(Math.abs(currentAngle) - degrees) <= 2){
+            stop();
+            moving = false;
+            return true;
+
+            // Continues to turn if not at the specified angle
+        }else{
+            joystickDrive(0, 0, power);
+            return false;
+        }
+    }
 
 
 // Gets the current angle of the robot
