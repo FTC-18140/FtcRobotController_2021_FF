@@ -33,7 +33,6 @@ public class Thunderbot_2021 {
     // pulling in the other areas
     LinearSlide linear = new LinearSlide();
     Carousel carousel = new Carousel();
-    armMotor arm = new armMotor();
     intake intake = new intake();
     // DcMotor armMotor = null;
 
@@ -120,8 +119,6 @@ public class Thunderbot_2021 {
         linear.init(hwMap, telemetry);
 
         carousel.init(hwMap, telemetry);
-
-        arm.init(hwMap, telemetry);
 
         intake.init(hwMap, telemetry);
     }

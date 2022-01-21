@@ -29,17 +29,12 @@ public class LinearSlide {
         hwMap = ahwMap;
         telemetry = telem;
 
-        linearSlideR = hwMap.dcMotor.get("linearL");
+        linearSlideR = hwMap.dcMotor.get("linear");
         linearSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         linearSlideR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linearSlideR.setDirection(DcMotorSimple.Direction.FORWARD);
         linearSlideR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        linearSlideL = hwMap.dcMotor.get("linearR");
-        linearSlideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearSlideL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        linearSlideL.setDirection(DcMotorSimple.Direction.FORWARD);
-        linearSlideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         linearSlideServoL = hwMap.servo.get("lssl");
         linearSlideServoR = hwMap.servo.get("lssr");

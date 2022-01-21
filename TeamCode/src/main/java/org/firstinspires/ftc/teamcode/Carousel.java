@@ -1,15 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import static android.os.SystemClock.sleep;
-
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Carousel {
-    CRServo leftServo = null;
-    CRServo rightServo = null;
+    DcMotor carousel = null;
     HardwareMap hwMap = null;
 
     private Telemetry telemetry;
@@ -18,19 +15,15 @@ public class Carousel {
         hwMap = ahwMap;
         telemetry = telem;
 
-        leftServo = hwMap.crservo.get("ls");
-        rightServo = hwMap.crservo.get("rs");
+        carousel = hwMap.dcMotor.get("carousel");
     }
     public void spin(double speed) {
-        leftServo.setPower(speed);
-        rightServo.setPower(-speed);
+        carousel.setPower(speed);
     }
     public void autoSpin(double power){
-        leftServo.setPower(power);
-        rightServo.setPower(-power);
+        carousel.setPower(power);
     }
     public void spinStop() {
-        leftServo.setPower(0);
-        rightServo.setPower(0);
+        carousel.setPower(0);
     }
 }

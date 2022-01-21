@@ -58,23 +58,17 @@ public class Teleop2 extends OpMode {
             robot.linear.servoHold();
         }
         //  above is the code that makes the linear slide extend and retract
-
-        if (gamepad2.left_bumper) {
-            robot.arm.close();
-        } else {
-            robot.arm.open();
-        }
-
         // above is the code for the arm's claws closing whenever you press and hold the left bumper
 
         if (gamepad1.right_bumper) {
             robot.carousel.spin(1);
+        } else if(gamepad1.left_bumper) {
+            robot.carousel.spin(-1);
         } else {
             robot.carousel.spinStop();
         }
 
         // above is the code for the carousel spinning whenever you press the right bumper
-        robot.arm.lift(gamepad2.left_stick_y);
 /*
         if (gamepad1.a) {
             robot.arm.lift(-1);

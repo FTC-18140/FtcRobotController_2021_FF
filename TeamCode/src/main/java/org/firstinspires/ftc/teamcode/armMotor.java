@@ -1,14 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import static java.lang.Math.abs;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
+@Disabled
 public class armMotor {
-    Servo leftClaw = null;
+    /*Servo leftClaw = null;
     Servo rightClaw = null;
     DcMotor armMotor = null;
     HardwareMap hwMap = null;
@@ -53,7 +54,7 @@ public class armMotor {
             stopLift();
             }
         }
-        */
+
         public void stopLift() {
             armMotor.setPower(0);
         }
@@ -64,6 +65,6 @@ public class armMotor {
         public void open() {
             leftClaw.setPosition(0);
             rightClaw.setPosition(1);
-        }
+        }*/
     }
 
