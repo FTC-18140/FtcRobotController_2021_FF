@@ -16,6 +16,7 @@ public class AutoBlue extends OpMode {
     public void start() {
         telemetry.addData("Start:", "pressed");
     }
+
     int state = 0;
     boolean done = false;
 

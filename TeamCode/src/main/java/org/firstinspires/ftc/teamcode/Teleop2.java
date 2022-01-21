@@ -31,19 +31,12 @@ public class Teleop2 extends OpMode {
         // above is the code for the basic motor
 
         if (gamepad2.a) {
-            robot.linear.linearSlideR.setPower(1);
-            robot.linear.linearSlideL.setPower(1);
+            robot.linear.linearSlide.setPower(1);
         } else if (gamepad2.b) {
-            robot.linear.linearSlideR.setPower(-1);
-            robot.linear.linearSlideL.setPower(-1);
+            robot.linear.linearSlide.setPower(-1);
         } else {
-            robot.linear.linearSlideR.setPower(0);
-            robot.linear.linearSlideL.setPower(0);
+            robot.linear.linearSlide.setPower(0);
         }
-
-
-       // robot.linear.extend(100, gamepad2.right_trigger);
-       // robot.linear.extend(-100, -gamepad2.left_trigger);
 
         if (gamepad2.x) {
             robot.intake.intakeMove(1);
@@ -67,18 +60,6 @@ public class Teleop2 extends OpMode {
         } else {
             robot.carousel.spinStop();
         }
-
-        // above is the code for the carousel spinning whenever you press the right bumper
-/*
-        if (gamepad1.a) {
-            robot.arm.lift(-1);
-        } else if (gamepad1.b) {
-            robot.arm.lift(1);
-        } else {
-            robot.arm.stopLift();
-        }
-*/
-        // above is the code that moves the arm up and down whenever you press a and b
 
     }
 }

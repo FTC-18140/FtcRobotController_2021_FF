@@ -182,11 +182,11 @@ public class Thunderbot_2021 {
         // Set initial angle and position
         if(!moving){
             gyStartAngle = updateHeading();
-            initialPosition = leftFront.getCurrentPosition();
+            initialPosition = rightFront.getCurrentPosition();
             moving = true;
         }
 
-        double position = abs(leftFront.getCurrentPosition() - initialPosition);
+        double position = abs(rightFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
 
         // calculates required speed to adjust to gyStartAngle
