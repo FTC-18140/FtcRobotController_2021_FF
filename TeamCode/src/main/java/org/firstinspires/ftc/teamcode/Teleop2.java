@@ -54,9 +54,9 @@ public class Teleop2 extends OpMode {
         // above is the code for the arm's claws closing whenever you press and hold the left bumper
 
         if (gamepad1.right_bumper) {
-            robot.carousel.spin(1);
+            robot.carousel.spin(0.5);
         } else if(gamepad1.left_bumper) {
-            robot.carousel.spin(-1);
+            robot.carousel.spin(-0.5);
         } else {
             robot.carousel.spinStop();
         }

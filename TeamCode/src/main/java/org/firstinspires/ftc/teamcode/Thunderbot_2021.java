@@ -52,6 +52,7 @@ public class Thunderbot_2021 {
     private Telemetry telemetry;
 
     /**
+     *
      * Constructor
      */
     public Thunderbot_2021() {
@@ -105,14 +106,14 @@ public class Thunderbot_2021 {
         leftFront = hwMap.dcMotor.get("lf");
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         leftRear = hwMap.dcMotor.get("lr");
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 // Initializing all of the other classes that are used in the robot
@@ -182,11 +183,11 @@ public class Thunderbot_2021 {
         // Set initial angle and position
         if(!moving){
             gyStartAngle = updateHeading();
-            initialPosition = rightFront.getCurrentPosition();
+            initialPosition = leftFront.getCurrentPosition();
             moving = true;
         }
 
-        double position = abs(rightFront.getCurrentPosition() - initialPosition);
+        double position = abs(leftFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
 
         // calculates required speed to adjust to gyStartAngle
