@@ -17,18 +17,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 
 
 public class Thunderbot_2021 {
     /**
      * Public OpMode members
      */
+    // defines all varibles setting them to null
+    BNO055IMU imu = null;
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
-
-    BNO055IMU imu = null;
+    // pulling in the other areas
+    LinearSlide linear = new LinearSlide();
+    Carousel carousel = new Carousel();
+    armMotor arm = new armMotor();
+    intake intake = new intake();
+    // DcMotor armMotor = null;
 
 
     // converts inches to motor ticks
@@ -53,15 +60,10 @@ public class Thunderbot_2021 {
     }
 
     /**
-     * Initializes the robot
-     * @param ahwMap -
-     * @param telem -
+     * Initialize standard Hardware interfaces
      */
-    public void init (HardwareMap ahwMap, Telemetry telem) {
+    public void init(HardwareMap ahwMap, Telemetry telem) {
         // Save reference to Hardware map
-        hwMap = ahwMap;
-        telemetry = telem;
-
         try {
             // Set up the parameters with which we will use our IMU. Note that integration
             // algorithm here just reports accelerations to the logcat log; it doesn't actually
@@ -75,61 +77,75 @@ public class Thunderbot_2021 {
             parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
             // Retrieve and initialize the IMU.
-            imu = ahwMap.get(BNO055IMU.class, "imu 1");
+            imu = ahwMap.get(BNO055IMU.class, "imu");
             imu.initialize(parameters);
-        } catch (Exception p_exeception) {
-            telemetry.addData("imu not found in config file", 0);
-            imu = null;
-        }
+        } catch (Exception p_exeception)
+
+    {
+        telemetry.addData("imu not found in config file", 0);
+        imu = null;
+    }
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+        hwMap = ahwMap;
+        telemetry = telem;
 
         // Define & Initialize Motors
         rightFront = hwMap.dcMotor.get("rf");
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightRear = hwMap.dcMotor.get("rr");
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFront = hwMap.dcMotor.get("lf");
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         leftRear = hwMap.dcMotor.get("lr");
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+// Initializing all of the other classes that are used in the robot
+        linear.init(hwMap, telemetry);
+
+        carousel.init(hwMap, telemetry);
+
+        arm.init(hwMap, telemetry);
+
+        intake.init(hwMap, telemetry);
     }
 
     /**
-     * Uses Stick Values To Move the Robot
-     * @param forward - Y-Axis Value On The Left Stick
-     * @param right - X-Axis Value On The Left Stick
-     * @param clockwise - X-Axis Value On The Right Stick
+     * This code go's through the math behind the mecanum wheel drive
+     * @param foward - Any forward motion including backwards
+     * @param right - Any movement from left to right
+     * @param clockwise - Any turning movements
      */
-    public void joystickDrive (double forward, double right, double clockwise){
-        double frontLeft = forward + clockwise + right;
-        double frontRight = forward - clockwise - right;
-        double backLeft = forward + clockwise - right;
-        double backRight = forward - clockwise + right;
+    public void joystickDrive(double foward, double right, double clockwise) {
+        double frontLeft = foward + clockwise + right;
+        double frontRight = foward - clockwise - right;
+        double backLeft = foward + clockwise - right;
+        double backRight = foward - clockwise + right;
 
         double max = abs(frontLeft);
-        if (abs(frontRight) > max){
+        if (abs(frontRight) > max) {
             max = abs(frontRight);
         }
-        if (abs(backLeft) > max){
+        if (abs(backLeft) > max) {
             max = abs(backLeft);
         }
-        if (abs(backRight) > max){
+        if (abs(backRight) > max) {
             max = abs(backRight);
         }
         if (max > 1) {
@@ -144,12 +160,6 @@ public class Thunderbot_2021 {
         leftRear.setPower(backLeft);
         rightRear.setPower(backRight);
     }
-
-
-    double gyStartAngle = 0;
-    double initialPosition = 0;
-    boolean moving = false;
-
     /**
      * Drives in a specified direction for a specified distance
      * @param direction - Direction in Degrees The Robot Will Drive
@@ -157,11 +167,15 @@ public class Thunderbot_2021 {
      * @param power - Speed The Robot Will Travel
      * @return
      */
+
+    double gyStartAngle = 0;
+    double initialPosition = 0;
+    boolean moving = false;
     public boolean drive (double direction, double distance, double power) {
 
         // can it go diagonal left
         // 360 or 180 -180
-   
+
         double xValue = Math.sin(toRadians(direction)) * power;
         double yValue = Math.cos(toRadians(direction)) * power;
         double currentAngle = updateHeading();
@@ -178,10 +192,10 @@ public class Thunderbot_2021 {
         double position = abs(leftFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
 
-            // calculates required speed to adjust to gyStartAngle
-            double adjust = (currentAngle - gyStartAngle) / 100;
-            // Setting range of adjustments
-            adjust = Range.clip(adjust, -1, 1);
+        // calculates required speed to adjust to gyStartAngle
+        double adjust = (currentAngle - gyStartAngle) / 100;
+        // Setting range of adjustments
+        adjust = Range.clip(adjust, -1, 1);
 
         // Stops when at the specified distance
         if(positionInCM >= distance){
@@ -195,60 +209,57 @@ public class Thunderbot_2021 {
             return false;
         }
     }
-
-
     double startAngle = 0;
     double currentAngle = 0;
+/**
+ * Turns an Exact Angle in Degrees Using The Gyro
+ * @param degrees - Angle The Robot Will Turn
+ * @param power - Speed The Robot will Turn
+ * @return
+ */
+        public boolean turn (double degrees, double power) {
+            power = abs(power);
+            // Sets initial angle
+            if(!moving){
+                currentAngle = updateHeading();
+                startAngle = currentAngle;
+                moving = true;
+            }
 
-    /**
-     * Turns an Exact Angle in Degrees Using The Gyro
-     * @param degrees - Angle The Robot Will Turn
-     * @param power - Speed The Robot will Turn
-     * @return
-     */
-    public boolean turn (double degrees, double power){
-        power = abs(power);
-        // Sets initial angle
-        if(!moving){
+            // Updates current angle
             currentAngle = updateHeading();
-            startAngle = currentAngle;
-            moving = true;
-        }
+            telemetry.addData("current angle", updateHeading());
+            telemetry.update();
 
-        // Updates current angle
-        currentAngle = updateHeading();
-        telemetry.addData("current angle", updateHeading());
-        telemetry.update();
+            if (0 > degrees){
+                power = -power;
+            }
 
-        if (0 > degrees){
-            power = -power;
-        }
+            // what happens if above 180
 
-        // what happens if above 180
+            if (abs(degrees) == 180){
+                // avoid 180 somehow
+            }
 
-        if (abs(degrees) == 180){
-            // avoid 180 somehow
-        }
-
-        // Stops turning when at the specified angle
-        if(Math.abs(currentAngle - startAngle) >= abs(degrees)){
+            // Stops turning when at the specified angle
+            if(Math.abs(currentAngle - startAngle) >= abs(degrees)){
                 stop();
                 moving = false;
                 return true;
 
-        // Continues to turn if not at the specified angle
-        }else{
-            joystickDrive(0, 0, power);
-            return false;
+                // Continues to turn if not at the specified angle
+            }else{
+                joystickDrive(0, 0, power);
+                return false;
+            }
         }
-    }
 
 
-    // Gets the current angle of the robot
-    public double updateHeading() {
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
-    }
+// Gets the current angle of the robot
+        public double updateHeading() {
+            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
+        }
 
 
     // Stop all motors
