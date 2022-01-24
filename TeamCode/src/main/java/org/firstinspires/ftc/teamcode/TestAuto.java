@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="AutoRed", group="Auto")
+@Autonomous(name="TestAuto", group="Auto")
 public class TestAuto extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
@@ -22,7 +22,7 @@ public class TestAuto extends OpMode {
     @Override
     public void loop () {
         switch (state) {
-            case 0:
+            /*case 0:
                 if (getRuntime() < 10) {
                     robot.stop();
                 } else {
@@ -30,8 +30,8 @@ public class TestAuto extends OpMode {
                     done = false;
                     state++;
                 }
-                break;
-            case 1:
+                break;*/
+            case 0:
                 if (!done) {
                     done = robot.turnTo(90, 0.75);
                 } else {

@@ -10,8 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class LinearSlide {
-    DcMotor linearSlideR = null;
-    DcMotor linearSlideL = null;
+    DcMotor linearSlide = null;
     Servo linearSlideServoL = null;
     Servo linearSlideServoR = null;
     HardwareMap hwMap = null;
@@ -29,11 +28,11 @@ public class LinearSlide {
         hwMap = ahwMap;
         telemetry = telem;
 
-        linearSlideR = hwMap.dcMotor.get("linear");
-        linearSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearSlideR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        linearSlideR.setDirection(DcMotorSimple.Direction.FORWARD);
-        linearSlideR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearSlide = hwMap.dcMotor.get("linear");
+        linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        linearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+        linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         linearSlideServoL = hwMap.servo.get("lssl");
@@ -44,15 +43,14 @@ public class LinearSlide {
     boolean moving = false;
 
     public boolean extend(double distance, double power) {
-        linearSlideL.setPower(power);
-        linearSlideR.setPower(power);
+        linearSlide.setPower(power);
 
         if (!moving) {
-            initial = linearSlideL.getCurrentPosition();
+            initial = linearSlide.getCurrentPosition();
 
             moving = true;
         }
-        double position3 = abs(linearSlideL.getCurrentPosition() - initial);
+        double position3 = abs(linearSlide.getCurrentPosition() - initial);
         double positionInCM3 = position3 / COUNTS_PER_CM;
 
         if (positionInCM3 >= distance) {
@@ -62,8 +60,7 @@ public class LinearSlide {
         return false;
     }
         public void stopExtend () {
-            linearSlideL.setPower(0);
-            linearSlideR.setPower(0);
+            linearSlide.setPower(0);
         }
         public void servoTurn() {
             linearSlideServoL.setPosition(-1);

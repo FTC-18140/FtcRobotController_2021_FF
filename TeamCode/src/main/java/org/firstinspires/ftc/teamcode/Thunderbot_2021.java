@@ -105,14 +105,14 @@ public class Thunderbot_2021 {
         leftFront = hwMap.dcMotor.get("lf");
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         leftRear = hwMap.dcMotor.get("lr");
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 // Initializing all of the other classes that are used in the robot
