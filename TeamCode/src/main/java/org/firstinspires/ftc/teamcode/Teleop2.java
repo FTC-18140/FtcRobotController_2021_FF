@@ -23,6 +23,7 @@ public class Teleop2 extends OpMode {
     public void loop() {
         robot.joystickDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
+        telemetry.addData("linearSlide Pos: ", robot.linear.linearSlide.getCurrentPosition());
         telemetry.addData("lx", gamepad1.left_stick_x);
         telemetry.addData("ly", gamepad1.left_stick_y);
         telemetry.addData("rx", gamepad1.right_stick_x);
@@ -37,7 +38,6 @@ public class Teleop2 extends OpMode {
         } else {
             robot.linear.linearSlide.setPower(0);
         }
-
         if (gamepad2.x) {
             robot.intake.intakeMove(1);
         } else if (gamepad2.y) {
@@ -45,22 +45,25 @@ public class Teleop2 extends OpMode {
         } else {
             robot.intake.intakeStop();
         }
-        if(gamepad2.dpad_up) {
+       /*if (gamepad2.dpad_up) {
             robot.linear.servoTurn();
-        } else {
-            robot.linear.servoHold();
         }
-        //  above is the code that makes the linear slide extend and retract
-        // above is the code for the arm's claws closing whenever you press and hold the left bumper
-
-        if (gamepad1.right_bumper) {
-            robot.carousel.spin(0.5);
-        } else if(gamepad1.left_bumper) {
-            robot.carousel.spin(-0.5);
-        } else {
-            robot.carousel.spinStop();
+        if (gamepad2.dpad_down) {
+            robot.linear.negativeServoTurn();
         }
+        */
+        robot.linear.servoTurn(gamepad2.left_stick_y);
 
+
+    //  above is the code that makes the linear slide extend and retract
+    // above is the code for the arm's claws closing whenever you press and hold the left bumper
+
+    if(gamepad1.right_bumper) {
+        robot.carousel.spin(0.65);
+    } else if(gamepad1.left_bumper) {
+        robot.carousel.spin(-0.65);
+    } else {
+        robot.carousel.spinStop();
+         }
     }
 }
-

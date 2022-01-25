@@ -100,7 +100,7 @@ public class Thunderbot_2021 {
         rightRear = hwMap.dcMotor.get("rr");
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFront = hwMap.dcMotor.get("lf");
@@ -183,11 +183,11 @@ public class Thunderbot_2021 {
         // Set initial angle and position
         if(!moving){
             gyStartAngle = updateHeading();
-            initialPosition = leftFront.getCurrentPosition();
+            initialPosition = rightFront.getCurrentPosition();
             moving = true;
         }
 
-        double position = abs(leftFront.getCurrentPosition() - initialPosition);
+        double position = abs(rightFront.getCurrentPosition() - initialPosition);
         double positionInCM = position/COUNTS_PER_CM;
 
         // calculates required speed to adjust to gyStartAngle
