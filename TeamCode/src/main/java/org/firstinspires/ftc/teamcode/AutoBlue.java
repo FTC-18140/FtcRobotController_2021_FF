@@ -43,7 +43,7 @@ public class AutoBlue extends OpMode {
                 }
                 break;
             case 2:
-                if (getRuntime() < 10.25) {
+                if (getRuntime() < 4) {
                     robot.carousel.autoSpin(1);
                 } else {
                     robot.carousel.spinStop();
@@ -62,7 +62,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 4:
                 if (!done) {
-                    done = robot.turn(30, 0.25);
+                    done = robot.turn(40, 0.25);
                 } else {
                     resetStartTime();
                     robot.stop();

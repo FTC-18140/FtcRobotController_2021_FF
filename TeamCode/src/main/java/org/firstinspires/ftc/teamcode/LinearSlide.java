@@ -63,8 +63,8 @@ public class LinearSlide {
             linearSlide.setPower(0);
         }
         public void servoTurn(double power) {
-            linearSlideServoL.setPower(-power);
-            linearSlideServoR.setPower(power);
+            linearSlideServoL.setPower(power);
+            linearSlideServoR.setPower(-power);
         }
         public void negativeServoTurn(double power
         ) {

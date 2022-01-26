@@ -45,13 +45,8 @@ public class Teleop2 extends OpMode {
         } else {
             robot.intake.intakeStop();
         }
-       /*if (gamepad2.dpad_up) {
-            robot.linear.servoTurn();
-        }
-        if (gamepad2.dpad_down) {
-            robot.linear.negativeServoTurn();
-        }
-        */
+
+
         robot.linear.servoTurn(gamepad2.left_stick_y);
 
 
