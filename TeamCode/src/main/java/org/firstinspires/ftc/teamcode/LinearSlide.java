@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,8 +12,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class LinearSlide {
     DcMotor linearSlide = null;
-    Servo linearSlideServoL = null;
-    Servo linearSlideServoR = null;
+    CRServo linearSlideServoL = null;
+    CRServo linearSlideServoR = null;
     HardwareMap hwMap = null;
 
     static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
@@ -35,8 +36,8 @@ public class LinearSlide {
         linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        linearSlideServoL = hwMap.servo.get("lssl");
-        linearSlideServoR = hwMap.servo.get("lssr");
+        linearSlideServoL = hwMap.crservo.get("lssl");
+        linearSlideServoR = hwMap.crservo.get("lssr");
     }
 
     double initial = 0;
@@ -63,23 +64,23 @@ public class LinearSlide {
             linearSlide.setPower(0);
         }
         public void servoTurn() {
-            linearSlideServoL.setPosition(-1);
-            linearSlideServoR.setPosition(1);
+            linearSlideServoL.setPower(-1);
+            linearSlideServoR.setPower(1);
         }
         public void negativeServoTurn() {
-            linearSlideServoL.setPosition(-0.75);
-            linearSlideServoR.setPosition(-0.75);
+            linearSlideServoL.setPower(-0.75);
+            linearSlideServoR.setPower(-0.75);
     }
         public void servoHold() {
-            linearSlideServoL.setPosition(-0.15);
-            linearSlideServoR.setPosition(0.15);
+            linearSlideServoL.setPower(-0.15);
+            linearSlideServoR.setPower(0.15);
         }
         /*public void servoStop(){
         linearSlideServoL.setPosition(0);
         linearSlideServoR.setPosition(0);
         }*/
         public void pressure() {
-        linearSlideServoL.setPosition(1);
-        linearSlideServoR.setPosition(1);
+        linearSlideServoL.setPower(1);
+        linearSlideServoR.setPower(1);
         }
     }

@@ -99,7 +99,7 @@ public class Thunderbot_2021 {
         rightRear = hwMap.dcMotor.get("rr");
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFront = hwMap.dcMotor.get("lf");
@@ -299,29 +299,17 @@ public class Thunderbot_2021 {
         telemetry.addData("current angle", updateHeading());
         telemetry.update();
 
-        if (abs(degrees) == 180){
-            // avoid 180 somehow
-        }
-
-        if (degrees - currentAngle < 0){
-            power = - power;
-        }
 
         if(10 > (Math.abs(currentAngle) - degrees)){
-            power = power * ((Math.abs(currentAngle)-degrees)/10);
+            power = power * ((Math.abs(currentAngle)- degrees)/100);
         }
 
-        //double adjust = (currentAngle - degrees) / 100;
-        /*if (degrees - currentAngle > 0) {
-            power = Range.clip(power, 0.2, 1.0);
-        }
-
-        if (degrees - currentAngle < 0) {
-            power = Range.clip(power, -0.2, -1.0);
+        /*if (0 < degrees) {
+            power = -power;
         }*/
 
         // Stops turning when at the specified angle
-        if(Math.abs(Math.abs(currentAngle) - degrees) <= 2){
+        if(Math.abs(Math.abs(currentAngle) - degrees) <= 0.25){ // forever increasing
             stop();
             moving = false;
             return true;

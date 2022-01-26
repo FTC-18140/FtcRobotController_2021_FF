@@ -33,13 +33,23 @@ public class TestAuto extends OpMode {
                 break;*/
             case 0:
                 if (!done) {
-                    done = robot.turnTo(90, 0.75);
+                    done = robot.turnTo(90, 1.0);
                 } else {
                     robot.stop();
                     done = false;
                     state++;
                 }
                 break;
+
+            /*case 1:
+            if (!done) {
+                done = robot.turnTo(45, 1.0);
+            } else {
+                robot.stop();
+                done = false;
+                state++;
+            }
+            break;*/
 
             default:
                 break;
