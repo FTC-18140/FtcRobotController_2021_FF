@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="AutoBox", group="Auto")
+@Autonomous(name="BlueStorage", group="Auto")
 
 public class AutoBlueBox extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
@@ -25,7 +25,7 @@ public class AutoBlueBox extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    done = robot.drive(245, 10, 0.25);
+                    done = robot.drive(245, 10, 0.75);
                 } else {
                     robot.stop();
                     done = false;
@@ -43,8 +43,8 @@ public class AutoBlueBox extends OpMode {
                 }
                 break;
             case 2:
-                if (getRuntime() < 4) {
-                    robot.carousel.autoSpin(1);
+                if (getRuntime() < 3) {
+                    robot.carousel.autoSpin(-0.6);
                 } else {
                     robot.carousel.spinStop();
                     done = false;
@@ -53,8 +53,9 @@ public class AutoBlueBox extends OpMode {
                 break;
             case 3:
                 if (!done) {
-                    done = robot.turn(70, 0.25);
+                    done = robot.turn(30, 0.25);
                 } else {
+                    resetStartTime();
                     robot.stop();
                     done = false;
                     state++;
@@ -62,7 +63,16 @@ public class AutoBlueBox extends OpMode {
                 break;
             case 4:
                 if (!done) {
-                    done = robot.drive(0, 20, 0.25);
+                    done = robot.drive(90, 60, 0.6);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 5:
+                if (!done) {
+                    done = robot.drive(180, 5, 0.6);
                 } else {
                     robot.stop();
                     done = false;

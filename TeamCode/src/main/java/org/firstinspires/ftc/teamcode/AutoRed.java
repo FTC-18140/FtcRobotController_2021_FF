@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="AutoRed", group="Auto")
+@Autonomous(name="RedCarousel", group="Auto")
 public class AutoRed extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
@@ -22,6 +22,7 @@ public class AutoRed extends OpMode {
 
     @Override
     public void loop() {
+        telemetry.addData("state", state);
         switch (state) {
             case 0:
                 if (!done) {
@@ -67,10 +68,10 @@ public class AutoRed extends OpMode {
                 } else {
                     robot.carousel.spinStop();
                     done = false;
-                    state++;
+                    state =6 ;
                 }
                 break;
-            case 5:
+            /*case 5:
                 if (!done) {
                     done = robot.turn(10, 0.1);
                 } else {
@@ -79,7 +80,7 @@ public class AutoRed extends OpMode {
                     done = false;
                     state++;
                 }
-                break;
+                break;*/
             case 6:
                 if(!done) {
                     done = robot.drive(45,45, 0.25);
@@ -91,9 +92,8 @@ public class AutoRed extends OpMode {
                 break;
             case 7:
                 if (!done) {
-                    done = robot.turn(90, 0.1);
+                    done = robot.turn(-70, 0.1);
                 } else {
-                    resetStartTime();
                     robot.stop();
                     done = false;
                     state++;
@@ -101,7 +101,7 @@ public class AutoRed extends OpMode {
                 break;
             case 8:
                 if (!done) {
-                    done = robot.drive(0, 250, 0.75);
+                    done = robot.drive(180, 250, 0.75);
                 } else {
                     robot.stop();
                     done = false;

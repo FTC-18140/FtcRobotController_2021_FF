@@ -190,12 +190,22 @@ public class Thunderbot_2021 {
         // Set initial angle and position
         if(!moving){
             gyStartAngle = updateHeading();
-            initialPosition = rightFront.getCurrentPosition();
+            if(direction == 45) {
+                initialPosition = leftFront.getCurrentPosition();
+            } else {
+                initialPosition = rightFront.getCurrentPosition();
+            }
             moving = true;
         }
 
         double position = abs(rightFront.getCurrentPosition() - initialPosition);
+        if(direction == 45){
+            position = abs(leftFront.getCurrentPosition() - initialPosition);
+        } else{
+            position = abs(rightFront.getCurrentPosition() - initialPosition);
+        }
         double positionInCM = position/COUNTS_PER_CM;
+        telemetry.addData("position", position);
 
         // calculates required speed to adjust to gyStartAngle
         double adjust = (currentAngle - gyStartAngle) / 100;
@@ -210,6 +220,7 @@ public class Thunderbot_2021 {
 
             // Continues if not at the specified distance
         } else {
+
             joystickDrive(yValue, xValue, -adjust);
             return false;
         }

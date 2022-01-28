@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="AutoBlue", group="Auto")
+@Autonomous(name="BlueCarousel", group="Auto")
 
 public class AutoBlue extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
@@ -43,8 +43,8 @@ public class AutoBlue extends OpMode {
                 }
                 break;
             case 2:
-                if (getRuntime() < 4) {
-                    robot.carousel.autoSpin(1);
+                if (getRuntime() < 3) {
+                    robot.carousel.autoSpin(-0.6);
                 } else {
                     robot.carousel.spinStop();
                     done = false;
@@ -53,7 +53,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 3:
                 if (!done) {
-                    done = robot.drive(90, 25, 0.75);
+                    done = robot.drive(90, 15, 0.75);
                 } else {
                     robot.stop();
                     done = false;
@@ -62,7 +62,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 4:
                 if (!done) {
-                    done = robot.turn(40, 0.25);
+                    done = robot.turn(30, 0.25);
                 } else {
                     resetStartTime();
                     robot.stop();

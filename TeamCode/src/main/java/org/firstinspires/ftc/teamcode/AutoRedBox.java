@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="AutoRedBox", group="Auto")
+@Autonomous(name="RedStorage", group="Auto")
 public class AutoRedBox extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
