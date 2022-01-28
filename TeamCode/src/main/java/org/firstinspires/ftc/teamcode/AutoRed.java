@@ -16,15 +16,16 @@ public class AutoRed extends OpMode {
     public void start() {
         telemetry.addData("Start:", "pressed");
     }
+
     int state = 0;
     boolean done = false;
 
     @Override
-    public void loop () {
+    public void loop() {
         switch (state) {
             case 0:
-                if (getRuntime() < 10) {
-                    robot.stop();
+                if (!done) {
+                    done = robot.drive(135, 20, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -33,7 +34,7 @@ public class AutoRed extends OpMode {
                 break;
             case 1:
                 if (!done) {
-                    done = robot.drive(115, 1.5, 0.75);
+                    done = robot.turn(160, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -42,7 +43,7 @@ public class AutoRed extends OpMode {
                 break;
             case 2:
                 if (!done) {
-                    done = robot.turn(-50, 0.25);
+                    done = robot.drive(-90, 15, 0.25);
                 } else {
                     resetStartTime();
                     robot.stop();
@@ -51,26 +52,27 @@ public class AutoRed extends OpMode {
                 }
                 break;
             case 3:
-                if (getRuntime() < 10.25) {
-                    robot.carousel.autoSpin(1);
+                if (!done) {
+                    done = robot.turn(-10, 0.1);
+                } else {
+                    resetStartTime();
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 4:
+                if (getRuntime() < 3) {
+                    robot.carousel.autoSpin(0.6);
                 } else {
                     robot.carousel.spinStop();
                     done = false;
                     state++;
                 }
                 break;
-            case 4:
-               if (!done) {
-                   done = robot.drive(-90, 25, 0.75);
-                } else {
-                    robot.stop();
-                    done = false;
-                    state++;
-                }
-                break;
             case 5:
                 if (!done) {
-                    done = robot.turn(-40, 0.25);
+                    done = robot.turn(10, 0.1);
                 } else {
                     resetStartTime();
                     robot.stop();
@@ -79,19 +81,35 @@ public class AutoRed extends OpMode {
                 }
                 break;
             case 6:
-                if (!done) {
-                    done = robot.drive(0, 250, 0.5);
+                if(!done) {
+                    done = robot.drive(45,45, 0.25);
                 } else {
                     robot.stop();
                     done = false;
                     state++;
                 }
                 break;
-
+            case 7:
+                if (!done) {
+                    done = robot.turn(90, 0.1);
+                } else {
+                    resetStartTime();
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 8:
+                if (!done) {
+                    done = robot.drive(0, 250, 0.75);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
             default:
                 break;
         }
     }
-
 }
-

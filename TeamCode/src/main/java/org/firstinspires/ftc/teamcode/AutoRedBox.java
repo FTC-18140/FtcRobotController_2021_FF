@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="AutoTest", group="Auto")
-public class AutoTest extends OpMode {
+@Autonomous(name="AutoRedBox", group="Auto")
+public class AutoRedBox extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
     public void init() {
@@ -25,7 +24,7 @@ public class AutoTest extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    done = robot.drive(0, 2.5, 0.75);
+                    done = robot.drive(135, 20, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -34,7 +33,7 @@ public class AutoTest extends OpMode {
                 break;
             case 1:
                 if (!done) {
-                    done = robot.drive(275, 20, 0.75);
+                    done = robot.turn(160, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -42,7 +41,27 @@ public class AutoTest extends OpMode {
                 }
                 break;
             case 2:
-                if (getRuntime() < 5) {
+                if (!done) {
+                    done = robot.drive(-90, 15, 0.25);
+                } else {
+                    resetStartTime();
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 3:
+                if (!done) {
+                    done = robot.turn(-10, 0.1);
+                } else {
+                    resetStartTime();
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 4:
+                if (getRuntime() < 3) {
                     robot.carousel.autoSpin(0.6);
                 } else {
                     robot.carousel.spinStop();
@@ -50,39 +69,28 @@ public class AutoTest extends OpMode {
                     state++;
                 }
                 break;
-            case 3:
-                if(!done) {
-                    done = robot.drive(0, 25, 0.75);
-                } else {
-                    robot.stop();
-                    done = false;
-                    state++;
-                }
-                break;
-            case 4:
-                if(!done) {
-                    done = robot.turn(75, 0.5);
-                } else {
-                    robot.stop();
-                    done = false;
-                    state++;
-                }
-                break;
             case 5:
+                if (!done) {
+                    done = robot.turn(10, 0.1);
+                } else {
+                    resetStartTime();
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 6:
                 if(!done) {
-                    done = robot.drive(0, 325, 0.75);
+                    done = robot.drive(0,43, 0.25);
                 } else {
                     robot.stop();
                     done = false;
                     state++;
                 }
                 break;
-
-
             default:
                 break;
+
         }
     }
 }
-
-

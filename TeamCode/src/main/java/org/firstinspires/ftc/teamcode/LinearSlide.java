@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class LinearSlide {
     DcMotor linearSlide = null;
+    DcMotor linearSlideP = null;
     CRServo linearSlideServoL = null;
     CRServo linearSlideServoR = null;
     HardwareMap hwMap = null;
@@ -34,6 +35,14 @@ public class LinearSlide {
         linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
         linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        linearSlideP = hwMap.dcMotor.get("linearPull");
+        linearSlideP.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearSlideP.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        linearSlideP.setDirection(DcMotorSimple.Direction.FORWARD);
+        linearSlideP.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
 
         linearSlideServoL = hwMap.crservo.get("lssl");
         linearSlideServoR = hwMap.crservo.get("lssr");
@@ -74,5 +83,9 @@ public class LinearSlide {
         public void servoHold() {
             linearSlideServoL.setPower(0);
             linearSlideServoR.setPower(0);
+        }
+        public void bothExtend() {
+            linearSlide.setPower(0.75);
+            linearSlideP.setPower(-0.75);
         }
     }
