@@ -41,9 +41,9 @@ public class Teleop2 extends OpMode {
 
         //LINEAR SLIDE
         if (gamepad2.a) {
-            robot.linear.linearSlide.setPower(.5);
+            robot.linear.linearSlide.setPower(1);
            } else if(gamepad2.b) {
-            robot.linear.linearSlide.setPower(-.5);
+            robot.linear.linearSlide.setPower(-1);
         } else {
             robot.linear.linearSlide.setPower(0);
         }
