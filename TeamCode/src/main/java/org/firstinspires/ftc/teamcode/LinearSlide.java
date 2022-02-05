@@ -51,7 +51,7 @@ public class LinearSlide {
     double initial = 0;
     boolean moving = false;
 
-    public boolean extend(double distance, double power) {
+    public boolean extendPosition(double distance, double power) {
         linearSlide.setPower(power);
 
         if (!moving) {
@@ -71,21 +71,14 @@ public class LinearSlide {
         public void stopExtend () {
             linearSlide.setPower(0);
         }
+        public void extend() {
+            linearSlide.setPower(1);
+        }
+        public void reverse() {
+            linearSlide.setPower(-1);
+        }
         public void servoTurn(double power) {
             linearSlideServoL.setPower(power);
             linearSlideServoR.setPower(-power);
-        }
-        public void negativeServoTurn(double power
-        ) {
-            linearSlideServoL.setPower(power);
-            linearSlideServoR.setPower(-power);
-        }
-        public void servoHold() {
-            linearSlideServoL.setPower(0);
-            linearSlideServoR.setPower(0);
-        }
-        public void bothExtend() {
-            linearSlide.setPower(0.75);
-            linearSlideP.setPower(-0.75);
         }
     }
