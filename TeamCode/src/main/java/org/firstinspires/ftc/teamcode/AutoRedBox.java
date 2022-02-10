@@ -81,7 +81,7 @@ public class AutoRedBox extends OpMode {
                 break;
             case 6:
                 if(!done) {
-                    done = robot.drive(0,43, 0.25);
+                    done = robot.drive(0,45, 0.25);
                 } else {
                     robot.stop();
                     done = false;
