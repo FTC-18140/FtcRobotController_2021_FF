@@ -61,10 +61,10 @@ public class Teleop2 extends OpMode {
 
         //INTAKE
         if (gamepad2.x) {
-            robot.intake.intakeMove(-1);
+            robot.intake.intakeMove(-0.9);
      //       robot.linear.extendPosition(0, 0.5);
         } else if (gamepad2.y) {
-            robot.intake.intakeMove(1);
+            robot.intake.intakeMove(0.9);
        //     robot.linear.extendPosition(5, 0.5);
         } else {
            robot.intake.intakeStop();

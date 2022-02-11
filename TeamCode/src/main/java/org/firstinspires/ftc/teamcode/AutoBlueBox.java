@@ -72,7 +72,7 @@ public class AutoBlueBox extends OpMode {
                 break;
             case 5:
                 if (!done) {
-                    done = robot.drive(180, 5, 0.6);
+                    done = robot.drive(180, 6, 0.6);
                 } else {
                     robot.stop();
                     done = false;
