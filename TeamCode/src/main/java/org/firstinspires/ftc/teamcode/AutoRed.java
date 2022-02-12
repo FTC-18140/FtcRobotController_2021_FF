@@ -35,7 +35,7 @@ public class AutoRed extends OpMode {
                 break;
             case 1:
                 if (!done) {
-                    done = robot.turn(160, 0.25);
+                    done = robot.turnTo(-160, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -44,9 +44,8 @@ public class AutoRed extends OpMode {
                 break;
             case 2:
                 if (!done) {
-                    done = robot.drive(-90, 15, 0.25);
+                    done = robot.drive(-90, 10, 0.25);
                 } else {
-                    resetStartTime();
                     robot.stop();
                     done = false;
                     state++;
@@ -54,7 +53,7 @@ public class AutoRed extends OpMode {
                 break;
             case 3:
                 if (!done) {
-                    done = robot.turn(-10, 0.1);
+                    done = robot.drive(150, 8, 0.25);; //robot.turnTo(150, 0.25);
                 } else {
                     resetStartTime();
                     robot.stop();
@@ -68,20 +67,10 @@ public class AutoRed extends OpMode {
                 } else {
                     robot.carousel.spinStop();
                     done = false;
-                    state =6 ;
-                }
-                break;
-            /*case 5:
-                if (!done) {
-                    done = robot.turn(10, 0.1);
-                } else {
-                    resetStartTime();
-                    robot.stop();
-                    done = false;
                     state++;
                 }
-                break;*/
-            case 6:
+                break;
+            case 5:
                 if(!done) {
                     done = robot.drive(45,45, 0.25);
                 } else {
@@ -90,18 +79,18 @@ public class AutoRed extends OpMode {
                     state++;
                 }
                 break;
-            case 7:
+            case 6:
                 if (!done) {
-                    done = robot.turn(-70, 0.1);
+                    done = robot.turnTo(95, 0.25);
                 } else {
                     robot.stop();
                     done = false;
                     state++;
                 }
                 break;
-            case 8:
+            case 7:
                 if (!done) {
-                    done = robot.drive(180, 250, 0.75);
+                    done = robot.drive(0, 250, 0.75);
                 } else {
                     robot.stop();
                     done = false;

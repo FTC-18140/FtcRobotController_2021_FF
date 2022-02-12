@@ -270,6 +270,38 @@ public class Thunderbot_2021 {
             }
         }
 
+    public boolean turnTo (double degrees, double power) {
+        power = abs(power);
+
+        if(!moving){
+            moving = true;
+        }
+
+        // Updates current angle
+        currentAngle = updateHeading();
+        telemetry.addData("current angle", updateHeading());
+
+
+
+
+
+        if(10 > (Math.abs(currentAngle) - degrees)){
+            power = power * ((Math.abs(currentAngle) - Math.abs(degrees))/100);
+        }
+
+        // Stops turning when at the specified angle
+        if(Math.abs(Math.abs(currentAngle) - Math.abs(degrees)) <= 0.5){ // forever increasing
+            stop();
+            moving = false;
+            return true;
+
+            // Continues to turn if not at the specified angle
+        }else{
+            joystickDrive(0, 0, power);
+            return false;
+        }
+    }
+
 
 // Gets the current angle of the robot
         public double updateHeading() {

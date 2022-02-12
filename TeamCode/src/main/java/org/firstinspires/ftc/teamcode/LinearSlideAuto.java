@@ -25,17 +25,36 @@ public class LinearSlideAuto extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    done = robot.linear.extendPosition(20, 0.25);
+                    done = robot.linear.extendPosition(85, 0.25);
                 } else {
-                    robot.stop();
+                    robot.linear.stopExtend();
+                    resetStartTime();
                     done = false;
                     state++;
                 }
                 break;
             case 1:
-                if (!done) {
+                if (getRuntime() < 3) {
+                    robot.linear.servoTurn(-0.5);
+                } else {
+                    robot.linear.servoTurn(0);
+                    resetStartTime();
+                    done = false;
+                    state++;
                 }
+                break;
 
+                case 2:
+                if (!done) {
+                    done = robot.linear.extendPosition(50, -0.25);
+                    robot.linear.servoTurn(1);
+                } else {
+                    robot.linear.servoTurn(0);
+                    robot.linear.stopExtend();
+                    done = false;
+                    state++;
+                }
+            break;
 
             default:
                 break;

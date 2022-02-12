@@ -22,18 +22,9 @@ public class AutoLRed extends OpMode {
     @Override
     public void loop () {
         switch (state) {
-            /*case 0:
-                if (getRuntime() < 10) {
-                    robot.stop();
-                } else {
-                    robot.stop();
-                    done = false;
-                    state++;
-                }
-                break;*/
             case 0:
                 if (!done) {
-                    done = robot.drive(200, 18, 0.75);
+                    done = robot.drive(180, 30, 0.6);
                 } else {
                     resetStartTime();
                     robot.stop();
@@ -41,46 +32,49 @@ public class AutoLRed extends OpMode {
                     state++;
                 }
                 break;
-            /*case 1:
-                if (getRuntime() < 1) {
-                    robot.intake.intakeMove(1);
+            case 1:
+                if (!done) {
+                    done = robot.linear.extendPosition(85, 0.25);
                 } else {
-                    robot.intake.intakeStop();
+                    robot.linear.stopExtend();
+                    resetStartTime();
                     done = false;
                     state++;
                 }
                 break;
             case 2:
-               if (!done) {
-                   done = robot.linear.extend(35, 1);
+                if (getRuntime() < 3) {
+                    robot.linear.servoTurn(-0.5);
                 } else {
-                   resetStartTime();
+                    robot.linear.servoTurn(0);
+                    resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 3:
+                if (!done) {
+                    done = robot.linear.extendPosition(50, -0.25);
+                    robot.linear.servoTurn(1);
+                } else {
+                    robot.linear.servoTurn(0);
                     robot.linear.stopExtend();
                     done = false;
                     state++;
                 }
                 break;
-            case 3:
-                if (getRuntime() < 2) {
-                    robot.linear.servoTurn();
-                } else {
-                    robot.linear.negativeServoTurn();
-                    done = false;
-                    state++;
-                }
-                break;
-            */
 
-            case 1:
+            case 4:
                 if (!done) {
-                    done = robot.turn(-90, 0.25);
+                    done = robot.turnTo(90, 0.75);
                 } else {
                     robot.stop();
                     done = false;
                     state++;
                 }
                 break;
-            case 2:
+            case 5:
                 if (!done) {
                     done = robot.drive(0, 170, 0.75);
                 } else {

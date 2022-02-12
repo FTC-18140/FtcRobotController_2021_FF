@@ -25,7 +25,7 @@ public class AutoLBlue extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    done = robot.drive(180, 18, 0.75);
+                    done = robot.drive(180, 25, 0.75);
                 } else {
                     resetStartTime();
                     robot.stop();
@@ -35,14 +35,47 @@ public class AutoLBlue extends OpMode {
                 break;
             case 1:
                 if (!done) {
-                    done = robot.turn(90, 0.25);
+                    done = robot.linear.extendPosition(85, 0.25);
+                } else {
+                    robot.linear.stopExtend();
+                    resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 2:
+                if (getRuntime() < 3) {
+                    robot.linear.servoTurn(-0.5);
+                } else {
+                    robot.linear.servoTurn(0);
+                    resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 3:
+                if (!done) {
+                    done = robot.linear.extendPosition(50, -0.25);
+                    robot.linear.servoTurn(1);
+                } else {
+                    robot.linear.servoTurn(0);
+                    robot.linear.stopExtend();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 4:
+                if (!done) {
+                    done = robot.turnTo(-90, 0.25);
                 } else {
                     robot.stop();
                     done = false;
                     state++;
                 }
                 break;
-            case 2:
+            case 5:
                 if (!done) {
                     done = robot.drive(0, 170, 0.75);
                 } else {
