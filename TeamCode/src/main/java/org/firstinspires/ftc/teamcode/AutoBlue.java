@@ -53,7 +53,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 3:
                 if (!done) {
-                    done = robot.drive(90, 15, 0.25);
+                    done = robot.drive(90, 10, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -72,14 +72,62 @@ public class AutoBlue extends OpMode {
                 break;
             case 5:
                 if (!done) {
-                    done = robot.drive(0, 285, 0.75);
+                    done = robot.drive(0, 100, 0.75);
                 } else {
                     robot.stop();
                     done = false;
                     state++;
                 }
                 break;
+            case 6:
+                if (!done) {
+                    done = robot.turnTo(-2, 0.25);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 7:
+                if (!done) {
+                    done = robot.drive(180, 4, 0.25);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 8:
+                if (!done) {
+                    done = robot.linear.extendPosition(85, 0.25);
+                } else {
+                    robot.linear.stopExtend();
+                    resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 9:
+                if (getRuntime() < 3) {
+                    robot.linear.servoTurn(-0.5);
+                } else {
+                    robot.linear.servoTurn(0);
+                    resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
 
+            case 10:
+                if (!done) {
+                    done = robot.linear.extendPosition(50, -0.25);
+                    robot.linear.servoTurn(1);
+                } else {
+                    robot.linear.servoTurn(0);
+                    robot.linear.stopExtend();
+                    done = false;
+                    state++;
+                }
             default:
                 break;
         }
