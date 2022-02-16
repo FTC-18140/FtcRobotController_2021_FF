@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,14 +11,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class LinearSlide {
-    DcMotor linearSlideR = null;
-    DcMotor linearSlideL = null;
-    Servo linearSlideServoL = null;
-    Servo linearSlideServoR = null;
+    DcMotor linearSlide = null;
+    DcMotor linearSlideP = null;
+    CRServo linearSlideServoL = null;
+    CRServo linearSlideServoR = null;
     HardwareMap hwMap = null;
 
     static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
-    static final double DRIVE_GEAR_REDUCTION = 20;
+    static final double DRIVE_GEAR_REDUCTION = 12;
     static final double WHEEL_DIAMETER_INCHES = 4.0; // For figuring circumference
     static final double WHEEL_DIAMETER_CM = (WHEEL_DIAMETER_INCHES * 2.54);
     static final double COUNTS_PER_CM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION)
@@ -29,35 +30,36 @@ public class LinearSlide {
         hwMap = ahwMap;
         telemetry = telem;
 
-        linearSlideR = hwMap.dcMotor.get("linearL");
-        linearSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearSlideR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        linearSlideR.setDirection(DcMotorSimple.Direction.FORWARD);
-        linearSlideR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearSlide = hwMap.dcMotor.get("linear");
+        linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        linearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+        linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        linearSlideL = hwMap.dcMotor.get("linearR");
-        linearSlideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearSlideL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        linearSlideL.setDirection(DcMotorSimple.Direction.FORWARD);
-        linearSlideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearSlideP = hwMap.dcMotor.get("linearPull");
+        linearSlideP.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearSlideP.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        linearSlideP.setDirection(DcMotorSimple.Direction.FORWARD);
+        linearSlideP.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        linearSlideServoL = hwMap.servo.get("lssl");
-        linearSlideServoR = hwMap.servo.get("lssr");
+
+
+        linearSlideServoL = hwMap.crservo.get("lssl");
+        linearSlideServoR = hwMap.crservo.get("lssr");
     }
 
     double initial = 0;
     boolean moving = false;
 
-    public boolean extend(double distance, double power) {
-        linearSlideL.setPower(power);
-        linearSlideR.setPower(power);
+    public boolean extendPosition(double distance, double power) {
+        linearSlide.setPower(power);
 
         if (!moving) {
-            initial = linearSlideL.getCurrentPosition();
+            initial = linearSlide.getCurrentPosition();
 
             moving = true;
         }
-        double position3 = abs(linearSlideL.getCurrentPosition() - initial);
+        double position3 = abs(linearSlide.getCurrentPosition() - initial);
         double positionInCM3 = position3 / COUNTS_PER_CM;
 
         if (positionInCM3 >= distance) {
@@ -67,27 +69,16 @@ public class LinearSlide {
         return false;
     }
         public void stopExtend () {
-            linearSlideL.setPower(0);
-            linearSlideR.setPower(0);
+            linearSlide.setPower(0);
         }
-        public void servoTurn() {
-            linearSlideServoL.setPosition(-1);
-            linearSlideServoR.setPosition(1);
+        public void extend() {
+            linearSlide.setPower(1);
         }
-        public void negativeServoTurn() {
-            linearSlideServoL.setPosition(-0.75);
-            linearSlideServoR.setPosition(-0.75);
-    }
-        public void servoHold() {
-            linearSlideServoL.setPosition(-0.15);
-            linearSlideServoR.setPosition(0.15);
+        public void reverse() {
+            linearSlide.setPower(-1);
         }
-        /*public void servoStop(){
-        linearSlideServoL.setPosition(0);
-        linearSlideServoR.setPosition(0);
-        }*/
-        public void pressure() {
-        linearSlideServoL.setPosition(1);
-        linearSlideServoR.setPosition(1);
+        public void servoTurn(double power) {
+            linearSlideServoL.setPower(power);
+            linearSlideServoR.setPower(-power);
         }
     }

@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="RedWarehouse", group="Auto")
-public class AutoLRed extends OpMode {
+@Autonomous(name="LinearSlideAuto", group="Auto")
+
+public class LinearSlideAuto extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
     public void init() {
@@ -16,6 +16,7 @@ public class AutoLRed extends OpMode {
     public void start() {
         telemetry.addData("Start:", "pressed");
     }
+
     int state = 0;
     boolean done = false;
 
@@ -23,16 +24,6 @@ public class AutoLRed extends OpMode {
     public void loop () {
         switch (state) {
             case 0:
-                if (!done) {
-                    done = robot.drive(180, 30, 0.6);
-                } else {
-                    resetStartTime();
-                    robot.stop();
-                    done = false;
-                    state++;
-                }
-                break;
-            case 1:
                 if (!done) {
                     done = robot.linear.extendPosition(85, 0.25);
                 } else {
@@ -42,7 +33,7 @@ public class AutoLRed extends OpMode {
                     state++;
                 }
                 break;
-            case 2:
+            case 1:
                 if (getRuntime() < 3) {
                     robot.linear.servoTurn(-0.5);
                 } else {
@@ -53,7 +44,7 @@ public class AutoLRed extends OpMode {
                 }
                 break;
 
-            case 3:
+                case 2:
                 if (!done) {
                     done = robot.linear.extendPosition(50, -0.25);
                     robot.linear.servoTurn(1);
@@ -63,26 +54,7 @@ public class AutoLRed extends OpMode {
                     done = false;
                     state++;
                 }
-                break;
-
-            case 4:
-                if (!done) {
-                    done = robot.turnTo(90, 0.75);
-                } else {
-                    robot.stop();
-                    done = false;
-                    state++;
-                }
-                break;
-            case 5:
-                if (!done) {
-                    done = robot.drive(0, 170, 0.75);
-                } else {
-                    robot.stop();
-                    done = false;
-                    state++;
-                }
-                break;
+            break;
 
             default:
                 break;
@@ -90,4 +62,6 @@ public class AutoLRed extends OpMode {
     }
 
 }
+
+
 

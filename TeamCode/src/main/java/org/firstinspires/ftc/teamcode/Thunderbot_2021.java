@@ -30,10 +30,10 @@ public class Thunderbot_2021 {
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
+    DcMotor intakeMotor = null;
     // pulling in the other areas
     LinearSlide linear = new LinearSlide();
     Carousel carousel = new Carousel();
-    armMotor arm = new armMotor();
     intake intake = new intake();
     // DcMotor armMotor = null;
 
@@ -53,6 +53,7 @@ public class Thunderbot_2021 {
     private Telemetry telemetry;
 
     /**
+     *
      * Constructor
      */
     public Thunderbot_2021() {
@@ -94,34 +95,38 @@ public class Thunderbot_2021 {
         rightFront = hwMap.dcMotor.get("rf");
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightRear = hwMap.dcMotor.get("rr");
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFront = hwMap.dcMotor.get("lf");
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         leftRear = hwMap.dcMotor.get("lr");
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        intakeMotor = hwMap.dcMotor.get("intake");
+        intakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 // Initializing all of the other classes that are used in the robot
         linear.init(hwMap, telemetry);
 
         carousel.init(hwMap, telemetry);
-
-        arm.init(hwMap, telemetry);
 
         intake.init(hwMap, telemetry);
     }
@@ -185,12 +190,22 @@ public class Thunderbot_2021 {
         // Set initial angle and position
         if(!moving){
             gyStartAngle = updateHeading();
-            initialPosition = leftFront.getCurrentPosition();
+            if(direction == 45) {
+                initialPosition = leftFront.getCurrentPosition();
+            } else {
+                initialPosition = rightFront.getCurrentPosition();
+            }
             moving = true;
         }
 
-        double position = abs(leftFront.getCurrentPosition() - initialPosition);
+        double position = abs(rightFront.getCurrentPosition() - initialPosition);
+        if(direction == 45){
+            position = abs(leftFront.getCurrentPosition() - initialPosition);
+        } else{
+            position = abs(rightFront.getCurrentPosition() - initialPosition);
+        }
         double positionInCM = position/COUNTS_PER_CM;
+        telemetry.addData("position", position);
 
         // calculates required speed to adjust to gyStartAngle
         double adjust = (currentAngle - gyStartAngle) / 100;
@@ -205,6 +220,7 @@ public class Thunderbot_2021 {
 
             // Continues if not at the specified distance
         } else {
+
             joystickDrive(yValue, xValue, -adjust);
             return false;
         }
@@ -253,6 +269,38 @@ public class Thunderbot_2021 {
                 return false;
             }
         }
+
+    public boolean turnTo (double degrees, double power) {
+        power = abs(power);
+
+        if(!moving){
+            moving = true;
+        }
+
+        // Updates current angle
+        currentAngle = updateHeading();
+        telemetry.addData("current angle", updateHeading());
+
+
+
+
+
+        if(10 > (Math.abs(currentAngle) - degrees)){
+            power = power * ((Math.abs(currentAngle) - Math.abs(degrees))/100);
+        }
+
+        // Stops turning when at the specified angle
+        if(Math.abs(Math.abs(currentAngle) - Math.abs(degrees)) <= 0.5){ // forever increasing
+            stop();
+            moving = false;
+            return true;
+
+            // Continues to turn if not at the specified angle
+        }else{
+            joystickDrive(0, 0, power);
+            return false;
+        }
+    }
 
 
 // Gets the current angle of the robot
