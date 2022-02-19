@@ -24,7 +24,7 @@ public class AutoLRed extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    done = robot.drive(180, 30, 0.6);
+                    done = robot.drive(180, 33, 0.25);
                 } else {
                     resetStartTime();
                     robot.stop();
@@ -67,7 +67,7 @@ public class AutoLRed extends OpMode {
 
             case 4:
                 if (!done) {
-                    done = robot.turnTo(90, 0.75);
+                    done = robot.turnTo(80, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -76,7 +76,7 @@ public class AutoLRed extends OpMode {
                 break;
             case 5:
                 if (!done) {
-                    done = robot.drive(0, 170, 0.75);
+                    done = robot.drive(180, 170, 0.75);
                 } else {
                     robot.stop();
                     done = false;

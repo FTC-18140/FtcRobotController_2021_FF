@@ -72,7 +72,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 5:
                 if (!done) {
-                    done = robot.drive(0, 100, 0.75);
+                    done = robot.drive(0, 110, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -81,7 +81,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 6:
                 if (!done) {
-                    done = robot.turnTo(-2, 0.25);
+                done = robot.turn(-95, .25);
                 } else {
                     robot.stop();
                     done = false;
@@ -90,7 +90,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 7:
                 if (!done) {
-                    done = robot.drive(180, 4, 0.25);
+                    done = robot.turnTo(4, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -98,6 +98,15 @@ public class AutoBlue extends OpMode {
                 }
                 break;
             case 8:
+                if (!done) {
+                    done = robot.drive(170, 10, 0.25);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 9:
                 if (!done) {
                     done = robot.linear.extendPosition(85, 0.25);
                 } else {
@@ -107,7 +116,7 @@ public class AutoBlue extends OpMode {
                     state++;
                 }
                 break;
-            case 9:
+            case 10:
                 if (getRuntime() < 3) {
                     robot.linear.servoTurn(-0.5);
                 } else {
@@ -118,7 +127,7 @@ public class AutoBlue extends OpMode {
                 }
                 break;
 
-            case 10:
+            case 11:
                 if (!done) {
                     done = robot.linear.extendPosition(50, -0.25);
                     robot.linear.servoTurn(1);
@@ -128,6 +137,26 @@ public class AutoBlue extends OpMode {
                     done = false;
                     state++;
                 }
+                break;
+            case 12:
+                if (!done) {
+                    done = robot.turnTo(-90, 0.25);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 13:
+            if (!done) {
+                done = robot.drive(0,155, 0.75);
+            } else {
+                robot.stop();
+                done = false;
+                state++;
+            }
+            break;
+
             default:
                 break;
         }

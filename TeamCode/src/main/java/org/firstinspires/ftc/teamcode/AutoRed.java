@@ -81,7 +81,7 @@ public class AutoRed extends OpMode {
                 break;
             case 6:
                 if (!done) {
-                    done = robot.turnTo(95, 0.25);
+                    done = robot.turnTo(98, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -90,7 +90,7 @@ public class AutoRed extends OpMode {
                 break;
             case 7:
                 if (!done) {
-                    done = robot.drive(0, 82, 0.75);
+                    done = robot.drive(0, 84, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -158,7 +158,7 @@ public class AutoRed extends OpMode {
                 break;
             case 14:
                 if (!done) {
-                    done = robot.drive(180, 130, 1);
+                    done = robot.drive(180, 160, 0.75);
                 } else {
                     robot.stop();
                     done = false;
