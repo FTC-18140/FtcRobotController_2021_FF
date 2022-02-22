@@ -31,6 +31,13 @@ public class Teleop2 extends OpMode {
     public void loop() {
         robot.joystickDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
         //ROBOT
+      /*  if (gamepad1.left_stick_button) {
+            robot.joystickDrive(-gamepad1.left_stick_y - 0.75, gamepad1.left_stick_x - 0.75, gamepad1.right_stick_x - 0.75);
+        } else {
+            robot.joystickDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+        }
+        */
+
         telemetry.addData("linearSlide Pos: ", robot.linear.linearSlide.getCurrentPosition());
         telemetry.addData("lx", gamepad1.left_stick_x);
         telemetry.addData("ly", gamepad1.left_stick_y);
