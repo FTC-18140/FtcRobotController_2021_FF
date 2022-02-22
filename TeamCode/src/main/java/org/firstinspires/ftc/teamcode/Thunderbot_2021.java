@@ -281,13 +281,17 @@ public class Thunderbot_2021 {
         currentAngle = updateHeading();
         telemetry.addData("current angle", updateHeading());
 
+        if(10 > Math.abs(currentAngle - degrees)){
+            //power = power * ((Math.abs(currentAngle) - Math.abs(degrees))/100);
+            power = power * Math.abs((Math.abs(currentAngle) - Math.abs(degrees))/100);
 
-
-
-
-        if(10 > (Math.abs(currentAngle) - degrees)){
-            power = power * ((Math.abs(currentAngle) - Math.abs(degrees))/100);
+            if(power > 0){
+                power = Range.clip(power, 0.1, 1);
+            } else{
+                power = Range.clip(power, -1, -0.1);
+            }
         }
+
 
         // Stops turning when at the specified angle
         if(Math.abs(Math.abs(currentAngle) - Math.abs(degrees)) <= 0.5){ // forever increasing

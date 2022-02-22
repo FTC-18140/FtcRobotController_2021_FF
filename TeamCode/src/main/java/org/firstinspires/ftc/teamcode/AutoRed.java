@@ -53,7 +53,7 @@ public class AutoRed extends OpMode {
                 break;
             case 3:
                 if (!done) {
-                    done = robot.drive(150, 8, 0.25);; //robot.turnTo(150, 0.25);
+                    done = robot.drive(150, 9, 0.25);; //robot.turnTo(150, 0.25);
                 } else {
                     resetStartTime();
                     robot.stop();
@@ -81,7 +81,7 @@ public class AutoRed extends OpMode {
                 break;
             case 6:
                 if (!done) {
-                    done = robot.turnTo(95, 0.25);
+                    done = robot.turnTo(98, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -90,7 +90,75 @@ public class AutoRed extends OpMode {
                 break;
             case 7:
                 if (!done) {
-                    done = robot.drive(0, 250, 0.75);
+                    done = robot.drive(0, 84, 0.25);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 8:
+                if (!done) {
+                    done = robot.turnTo(3, 0.25);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 9:
+                if (!done) {
+                    done = robot.drive(180, 4, 0.25);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 10:
+                if (!done) {
+                    done = robot.linear.extendPosition(85, 0.25);
+                } else {
+                    robot.linear.stopExtend();
+                    resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 11:
+                if (getRuntime() < 3) {
+                    robot.linear.servoTurn(-0.5);
+                } else {
+                    robot.linear.servoTurn(0);
+                    resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 12:
+                if (!done) {
+                    done = robot.linear.extendPosition(50, -0.25);
+                    robot.linear.servoTurn(1);
+                } else {
+                    robot.linear.servoTurn(0);
+                    robot.linear.stopExtend();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 13:
+                if (!done) {
+                    done = robot.turnTo(-80, 0.25);
+                } else {
+                    robot.stop();
+                    done = false;
+                    state++;
+                }
+                break;
+            case 14:
+                if (!done) {
+                    done = robot.drive(180, 160, 0.75);
                 } else {
                     robot.stop();
                     done = false;
