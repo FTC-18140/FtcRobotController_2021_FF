@@ -5,16 +5,18 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name="Teleop2", group="Teleop")
+@TeleOp(name="PrototypeTest", group="Teleop")
 public class Teleop2 extends OpMode {
     //    Thunderbot_2021 robot = new Thunderbot_2021();
     //motors
     Thunderbot_2021 robot = new Thunderbot_2021();
     HardwareMap hwMap = null;
-
+    double position2 = 0;
+    double position3 = 0 ;
     public void init() {
         robot.init(hardwareMap, telemetry);
 
@@ -29,67 +31,54 @@ public class Teleop2 extends OpMode {
 
     @Override
     public void loop() {
-        robot.joystickDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-        //ROBOT
-      /*  if (gamepad1.left_stick_button) {
-            robot.joystickDrive(-gamepad1.left_stick_y - 0.75, gamepad1.left_stick_x - 0.75, gamepad1.right_stick_x - 0.75);
-        } else {
-            robot.joystickDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-        }
-        */
+        telemetry.addData("linearSlide Pos: ", robot.linear.linearSlide.getCurrentPosition()/robot.linear.COUNTS_PER_CM);
 
-        telemetry.addData("linearSlide Pos: ", robot.linear.linearSlide.getCurrentPosition());
-        telemetry.addData("lx", gamepad1.left_stick_x);
-        telemetry.addData("ly", gamepad1.left_stick_y);
-        telemetry.addData("rx", gamepad1.right_stick_x);
-        telemetry.addData("ry", gamepad1.right_stick_y);
-
-        // above is the code for the basic motor
+        telemetry.addData("Basket servo Pos:", robot.linear.basketServo.getPosition());
+        telemetry.addData("Right servo Pos:", robot.linear.linearSlideServoR.getPosition());
+        telemetry.addData("Left servo Pos:", robot.linear.linearSlideServoL.getPosition());
 
         //LINEAR SLIDE
-        if (gamepad2.a) {
+        if (gamepad1.b) {
             robot.linear.extend();
-           } else if(gamepad2.b) {
+           } else if(gamepad1.a) {
             robot.linear.reverse();
         } else {
             robot.linear.stopExtend();
         }
 
-        if (gamepad2.right_bumper) {
-            robot.linear.linearSlideP.setPower(-1);
-        } else if (gamepad2.left_bumper) {
-            robot.linear.linearSlideP.setPower(1);
-        } else {
-            robot.linear.linearSlideP.setPower(0);
-        }
-
-
-
-
         //INTAKE
-        if (gamepad2.x) {
-            robot.intake.intakeMove(-0.9);
-     //       robot.linear.extendPosition(0, 0.5);
-        } else if (gamepad2.y) {
+        if (gamepad1.x) {
             robot.intake.intakeMove(0.9);
-       //     robot.linear.extendPosition(5, 0.5);
+        } else if (gamepad1.y) {
+            robot.intake.intakeMove(-0.9);
         } else {
            robot.intake.intakeStop();
-         //  robot.linear.stopExtend();
-            }
+        }
+
         //LINEAR SLIDE SERVOS
-        robot.linear.servoTurn(gamepad2.left_stick_y);
+        if (gamepad1.dpad_up) {
+            position2 = position2 + 0.01;
+            position2 = Range.clip(position2, 0, 1);
+            robot.linear.servoTurn(position2);
+        } else if (gamepad1.dpad_down) {
+            position2 = position2 - 0.01;
+            position2 = Range.clip(position2, 0, 1);
+            robot.linear.servoTurn(position2);
+        }
 
+        telemetry.addData("left stick y", gamepad1.left_stick_y);
+        telemetry.addData("position2: ", position2);
 
-    //  above is the code that makes the linear slide extend and retract
-    // above is the code for the arm's claws closing whenever you press and hold the left bumper
-        //CAROUSEL
-    if(gamepad1.right_bumper) {
-        robot.carousel.spin(0.65);
-    } else if(gamepad1.left_bumper) {
-        robot.carousel.spin(-0.65);
-    } else {
-        robot.carousel.spinStop();
-         }
+        position3 = robot.linear.basketServo.getPosition();
+
+        if (gamepad1.left_bumper) {
+            position3 = position3 + 0.2;
+            position3 = Range.clip(position3, 0, .2);
+            robot.linear.basketMove(position3);
+        } else if (gamepad1.right_bumper){
+            position3 = position3 - 0.2;
+            position3 = Range.clip(position3, 0, .2);
+            robot.linear.basketMove(position3);
+        }
     }
 }

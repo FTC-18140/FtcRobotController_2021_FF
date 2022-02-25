@@ -4,8 +4,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="RedWarehouse", group="Auto")
-public class AutoLRed extends OpMode {
+@Autonomous(name="DroppingFreight", group="Auto")
+public class DroppingFreight extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
     public void init() {
@@ -21,73 +21,79 @@ public class AutoLRed extends OpMode {
 
     @Override
     public void loop () {
+        telemetry.addData("state ", state);
         switch (state) {
             case 0:
-                if (!done) {
-                    done = robot.drive(180, 33, 0.25);
+                if (getRuntime() < 3) {
+                   robot.linear.servoTurn(0.2);
                 } else {
                     resetStartTime();
-                    robot.stop();
                     done = false;
                     state++;
                 }
                 break;
+
             case 1:
+                if (getRuntime() < 1) {
+                    robot.linear.basketMove(0.6);
+                } else {
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 2:
                 if (!done) {
-                    done = robot.linear.extendPosition(85, 0.25);
+                    done = robot.linear.retractSlide(74, 0.2);
+                    robot.linear.servoTurn(0.95);
                 } else {
                     robot.linear.stopExtend();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            /*case 0:
+                if (getRuntime() < 3) {
+                    robot.linear.servoTurn(0);
+                } else {
                     resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 1:
+                if (getRuntime() < 1) {
+                    robot.linear.basketMove(0.2);
+                } else {
                     done = false;
                     state++;
                 }
                 break;
             case 2:
-                if (getRuntime() < 3) {
-                    robot.linear.servoTurn(-0.5);
-                } else {
-                    robot.linear.servoTurn(0);
-                    resetStartTime();
-                    done = false;
-                    state++;
-                }
-                break;
-
-            case 3:
                 if (!done) {
-                    done = robot.linear.extendPosition(50, -0.25);
-                    robot.linear.servoTurn(1);
+                    done = robot.linear.extendSlide(25, 0.2);
+                    robot.linear.servoTurn(0.95);
                 } else {
-                    robot.linear.servoTurn(0);
                     robot.linear.stopExtend();
                     done = false;
                     state++;
                 }
                 break;
-
-            case 4:
+            case 3:
                 if (!done) {
-                    done = robot.turnTo(80, 0.25);
+                    done = robot.linear.retractSlide(24, 0.2);
                 } else {
-                    robot.stop();
+                    robot.linear.stopExtend();
                     done = false;
                     state++;
                 }
-                break;
-            case 5:
-                if (!done) {
-                    done = robot.drive(180, 170, 0.75);
-                } else {
-                    robot.stop();
-                    done = false;
-                    state++;
-                }
-                break;
+                break;*/
 
             default:
                 break;
         }
     }
-
 }
 
