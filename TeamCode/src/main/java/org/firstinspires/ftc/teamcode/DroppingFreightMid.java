@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="DroppingFreight", group="Auto")
-public class DroppingFreight extends OpMode {
+@Autonomous(name="DroppingFreightMid", group="Auto")
+public class DroppingFreightMid extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
     public void init() {
@@ -16,16 +15,28 @@ public class DroppingFreight extends OpMode {
     public void start() {
         telemetry.addData("Start:", "pressed");
     }
+
     int state = 0;
     boolean done = false;
 
     @Override
-    public void loop () {
+    public void loop() {
         telemetry.addData("state ", state);
         switch (state) {
             case 0:
+                if (!done) {
+                    done = robot.linear.extendSlide(25, 0.2);
+                } else {
+                    resetStartTime();
+                    robot.linear.stopExtend();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 1:
                 if (getRuntime() < 3) {
-                   robot.linear.servoTurn(0.2);
+                    robot.linear.servoTurn(0);
                 } else {
                     resetStartTime();
                     done = false;
@@ -33,19 +44,25 @@ public class DroppingFreight extends OpMode {
                 }
                 break;
 
-            case 1:
+            case 2:
                 if (getRuntime() < 1) {
-                    robot.linear.basketMove(0.6);
+                    robot.linear.basketMove(0.2);
                 } else {
                     done = false;
                     state++;
                 }
                 break;
-
-            case 2:
-                if (!done) {
-                    done = robot.linear.retractSlide(74, 0.2);
+            case 3:
+                if (getRuntime() < 2) {
                     robot.linear.servoTurn(0.95);
+                } else {
+                    done = false;
+                    state++;
+                }
+                break;
+            case 4:
+                if (!done) {
+                    done = robot.linear.retractSlide(24, 0.2);
                 } else {
                     robot.linear.stopExtend();
                     done = false;
@@ -58,4 +75,3 @@ public class DroppingFreight extends OpMode {
         }
     }
 }
-

@@ -2,11 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name="Auto", group="Auto")
-//@Disabled
-public class Auto extends OpMode {
+/*@Autonomous(name="Auto", group="Auto")
+@Disabled
+/*public class Auto extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
 
     public void init() {
@@ -68,3 +69,4 @@ public class Auto extends OpMode {
         }
     }
 }
+*/

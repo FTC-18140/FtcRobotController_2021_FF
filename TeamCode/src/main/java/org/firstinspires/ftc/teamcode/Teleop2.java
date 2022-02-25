@@ -23,6 +23,7 @@ public class Teleop2 extends OpMode {
         telemetry.addData("Init", "Start");
         telemetry.addData("Init", "Done");
 
+        position2 = robot.linear.linearSlideServoL.getPosition();
     }
 
     public void start() {
@@ -72,11 +73,11 @@ public class Teleop2 extends OpMode {
         position3 = robot.linear.basketServo.getPosition();
 
         if (gamepad1.left_bumper) {
-            position3 = position3 + 0.2;
-            position3 = Range.clip(position3, 0, .2);
+            position3 = position3 + 0.3;
+            position3 = Range.clip(position3, 0, .3);
             robot.linear.basketMove(position3);
         } else if (gamepad1.right_bumper){
-            position3 = position3 - 0.2;
+            position3 = position3 - 0.2; 
             position3 = Range.clip(position3, 0, .2);
             robot.linear.basketMove(position3);
         }

@@ -1,23 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.toRadians;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 
 
 public class Thunderbot_2021 {
@@ -28,7 +17,7 @@ public class Thunderbot_2021 {
     BNO055IMU imu = null;
     DcMotor intakeMotor = null;
     LinearSlide linear = new LinearSlide();
-    intake intake = new intake();
+    Intake intake = new Intake();
 
     // converts inches to motor ticks
     static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600

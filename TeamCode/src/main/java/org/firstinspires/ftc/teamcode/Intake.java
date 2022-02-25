@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class intake {
+public class Intake {
     DcMotor intakeMotor = null;
     HardwareMap hwMap = null;
 
