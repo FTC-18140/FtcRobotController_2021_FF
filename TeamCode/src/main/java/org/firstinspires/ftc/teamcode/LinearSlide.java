@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.util.concurrent.TimeUnit;
+
 public class LinearSlide {
     DcMotor linearSlide = null;
     DcMotor linearSlideP = null;
@@ -28,6 +30,8 @@ public class LinearSlide {
 
     private Telemetry telemetry;
     private int state;
+    boolean done = false;
+    private long startTime = 0; // in nanoseconds
 
     public void init(HardwareMap ahwMap, Telemetry telem) {
         hwMap = ahwMap;
@@ -52,8 +56,8 @@ public class LinearSlide {
         linearSlideServoR = hwMap.servo.get("lssr");
         linearSlideServoR.setDirection(REVERSE);
 
-        linearSlideServoL.setPosition(0.95);
-        linearSlideServoR.setPosition(0.95);
+        linearSlideServoL.setPosition(1);
+        linearSlideServoR.setPosition(1);
         basketServo.setPosition(0.38);
     }
 
@@ -119,12 +123,57 @@ public class LinearSlide {
         telemetry.addData("wrist servo", basketServo.getPosition());
     }
 
-    public void basketHoldTop (){
+    public void holding (){
+        servoTurn(0.18);
+    }
+
+    public boolean dropping () {
+        boolean allDone = false;
         switch (state) {
             case 0:
+                if (getRuntime() < 2) {
+                    servoTurn(0.2);
+                } else {
+                    resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 1:
+                if (getRuntime() < 1) {
+                    basketMove(0.6);
+                } else {
+                    resetStartTime();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 2:
+                if (getRuntime() < 1) {
+                    servoTurn(0.95);
+                } else {
+                    done = false;
+                    allDone = true;
+                    state++;
+                }
+                break;
 
             default:
                 break;
         }
+        return allDone;
+    }
+    public double getRuntime() {
+        final double NANOSECONDS_PER_SECOND = TimeUnit.SECONDS.toNanos(1);
+        return (System.nanoTime() - startTime) / NANOSECONDS_PER_SECOND;
+    }
+
+    /**
+     * Reset the start time to zero.
+     */
+    public void resetStartTime() {
+        startTime = System.nanoTime();
     }
 }

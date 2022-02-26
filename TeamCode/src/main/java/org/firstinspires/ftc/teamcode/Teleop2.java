@@ -78,9 +78,16 @@ public class Teleop2 extends OpMode {
             position3 = Range.clip(position3, 0, .3);
             robot.linear.basketMove(position3);
         } else if (gamepad2.right_bumper){
-            position3 = position3 - 0.2;
-            position3 = Range.clip(position3, 0, .2);
+            position3 = position3 + 0.2;
+            position3 = Range.clip(position3, 0, .35);
             robot.linear.basketMove(position3);
+        }
+
+        // PRE-SETS
+        if (gamepad2.dpad_left) {
+            robot.linear.holding();
+        } else if(gamepad2.dpad_right){
+            robot.linear.dropping();
         }
 
         //CAROUSEL
