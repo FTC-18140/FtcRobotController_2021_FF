@@ -108,7 +108,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 9:
                 if (!done) {
-                    done = robot.linear.extendPosition(85, 0.25);
+                    //done = robot.linear.extendPosition(85, 0.25);
                 } else {
                     robot.linear.stopExtend();
                     resetStartTime();
@@ -129,7 +129,7 @@ public class AutoBlue extends OpMode {
 
             case 11:
                 if (!done) {
-                    done = robot.linear.extendPosition(50, -0.25);
+                    //done = robot.linear.extendPosition(50, -0.25);
                     robot.linear.servoTurn(1);
                 } else {
                     robot.linear.servoTurn(0);
