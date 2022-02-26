@@ -27,6 +27,4 @@ public class CappingTurret {
         /*xServo.setPosition(0);
         yServo.setPosition(0);*/
     }
-
-
 }
