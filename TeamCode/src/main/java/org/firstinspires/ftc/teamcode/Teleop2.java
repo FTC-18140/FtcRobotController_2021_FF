@@ -59,6 +59,8 @@ public class Teleop2 extends OpMode {
             }
 
         //LINEAR SLIDE SERVOS
+        position2 = robot.linear.linearSlideServoR.getPosition();
+
         if (gamepad2.dpad_down) {
             position2 = position2 + 0.01;
             position2 = Range.clip(position2, 0, 1);
