@@ -108,7 +108,7 @@ public class AutoBlue extends OpMode {
                 break;
             case 9:
                 if (!done) {
-                    //done = robot.linear.extendPosition(85, 0.25);
+                    done = robot.linear.extendSlide(70, 0.5);
                 } else {
                     robot.linear.stopExtend();
                     resetStartTime();
@@ -117,10 +117,9 @@ public class AutoBlue extends OpMode {
                 }
                 break;
             case 10:
-                if (getRuntime() < 3) {
-                    robot.linear.servoTurn(-0.5);
+                if (getRuntime() < 1) {
+                    robot.linear.servoTurn(0.2);
                 } else {
-                    robot.linear.servoTurn(0);
                     resetStartTime();
                     done = false;
                     state++;
@@ -128,17 +127,25 @@ public class AutoBlue extends OpMode {
                 break;
 
             case 11:
+                if (getRuntime() < 1) {
+                    robot.linear.basketMove(0.6);
+                } else {
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 12:
                 if (!done) {
-                    //done = robot.linear.extendPosition(50, -0.25);
+                    done = robot.linear.retractSlide(70  , 0.15);
                     robot.linear.servoTurn(1);
                 } else {
-                    robot.linear.servoTurn(0);
                     robot.linear.stopExtend();
                     done = false;
                     state++;
                 }
                 break;
-            case 12:
+            case 13:
                 if (!done) {
                     done = robot.turnTo(-90, 0.25);
                 } else {
@@ -147,7 +154,7 @@ public class AutoBlue extends OpMode {
                     state++;
                 }
                 break;
-            case 13:
+            case 14:
             if (!done) {
                 done = robot.drive(0,155, 0.75);
             } else {

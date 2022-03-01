@@ -35,7 +35,7 @@ public class AutoLBlue extends OpMode {
                 break;
             case 1:
                 if (!done) {
-                    //done = robot.linear.extendPosition(85, 0.25);
+                    done = robot.linear.extendSlide(70, 0.5);
                 } else {
                     robot.linear.stopExtend();
                     resetStartTime();
@@ -44,28 +44,36 @@ public class AutoLBlue extends OpMode {
                 }
                 break;
             case 2:
-                if (getRuntime() < 3) {
-                    robot.linear.servoTurn(-0.5);
+                if (getRuntime() < 1) {
+                    robot.linear.servoTurn(0.2);
                 } else {
-                    robot.linear.servoTurn(0);
+                    resetStartTime();
                     done = false;
                     state++;
                 }
                 break;
 
             case 3:
-                if (!done) {
-                    //done = robot.linear.extendPosition(50, -0.25);
-                    robot.linear.servoTurn(1);
+                if (getRuntime() < 1) {
+                    robot.linear.basketMove(0.6);
                 } else {
-                    robot.linear.servoTurn(0);
-                    robot.linear.stopExtend();
                     done = false;
                     state++;
                 }
                 break;
 
             case 4:
+                if (!done) {
+                    done = robot.linear.retractSlide(70  , 0.15);
+                    robot.linear.servoTurn(1);
+                } else {
+                    robot.linear.stopExtend();
+                    done = false;
+                    state++;
+                }
+                break;
+
+            case 5:
                 if (!done) {
                     done = robot.turnTo(-90, 0.25);
                 } else {
@@ -74,7 +82,7 @@ public class AutoLBlue extends OpMode {
                     state++;
                 }
                 break;
-            case 5:
+            case 6:
                 if (!done) {
                     done = robot.drive(0, 170, 0.75);
                 } else {
