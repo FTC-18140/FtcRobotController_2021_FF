@@ -6,6 +6,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -17,14 +18,11 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Vision
 {
-
-
-
-// understand process frame method
-
-
     HardwareMap hwMap;
     /**
      * The webcam object which will grab the frames for us
@@ -41,7 +39,7 @@ public class Vision
     /**
      * The ID for the camera we are using (there are 2 on the robot)
      */
-    public String camDeviceName = "webcam";
+    //public String camDeviceName = "webcam";
 
     /**
      * Initializes the Vision class
@@ -53,8 +51,37 @@ public class Vision
         // Save reference to telemetry object
         hwMap = ahwMap;
         telemetry = telem;
+/**
+ * NOTE: Many comments have been omitted from this sample for the
+ * sake of conciseness. If you're just starting out with EasyOpenCv,
+ * you should take a look at {@link InternalCamera1Example} or its
+ * webcam counterpart, {@link WebcamExample} first.
+ */
 
-        int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
+        int cameraMonitorViewId = ahwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", ahwMap.appContext.getPackageName());
+        webCam = OpenCvCameraFactory.getInstance().createWebcam(ahwMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+
+        stageSwitchingPipeline = new StageSwitchingPipeline();
+
+        webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                webCam.setPipeline(stageSwitchingPipeline);
+                webCam.startStreaming(432 , 240, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+                /*
+                 * This will be called if the camera could not be opened
+                 */
+            }
+        });
+
+        /*int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
         webCam = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class,"Webcam 1") ,cameraMonitorViewId);
 
         stageSwitchingPipeline = new StageSwitchingPipeline();
@@ -72,59 +99,61 @@ public class Vision
             @Override
             public void onError(int errorCode)
             {
-                /*
+                *//*
                   This will be called if the camera could not be opened
-                 */
+                 *//*
             }
-        });
+        });*/
         /*
          * Look at the examples from EasyOpenCV and copy all the relevant initialization code here.
          */
 
     }
 
-
-
-    /**
-     * Returns the barcode read by the camera.
-     * @return int representing the barcode level: 1, 2, or 3
-     */
-    public int getBarcode()
-    {
-        // return the results from the pipeline.
-        return stageSwitchingPipeline.pipelineBarcode;
-    }
-
-
-
-
     /**
      * Implements a Barcode detection algorithm as an OpenCV pipeline.
      */
     static class StageSwitchingPipeline extends OpenCvPipeline
     {
-        int pipelineBarcode = 1;
-        Mat mat = new Mat();
-        Telemetry telemetry;
+        Mat yCbCrChan2Mat = new Mat();
+        Mat thresholdMat = new Mat();
+        Mat contoursOnFrameMat = new Mat();
+        List<MatOfPoint> contoursList = new ArrayList<>();
+        String duckPosition;
+        static double leftSum = 0;
+        static double rightSum = 0;
+        static double centerSum = 0;
 
-        public enum Location {
-            LEFT,
-            RIGHT,
-            NOT_FOUND
+        enum Stage
+        {
+            YCbCr_CHAN2,
+            THRESHOLD,
+            CONTOURS_OVERLAYED_ON_FRAME,
+            RAW_IMAGE,
         }
 
-        private Location location;
-        /**
-         * Rect creates areas in which the objects will be detected
-         */
+        private PipelineStageSwitchingExample.StageSwitchingPipeline.Stage stageToRenderToViewport = PipelineStageSwitchingExample.StageSwitchingPipeline.Stage.YCbCr_CHAN2;
+        private PipelineStageSwitchingExample.StageSwitchingPipeline.Stage[] stages = PipelineStageSwitchingExample.StageSwitchingPipeline.Stage.values();
 
-        static final Rect LEFT_ROI = new Rect(
-                new Point(60, 35),
-                new Point(120, 75));
-        static final Rect RIGHT_ROI = new Rect(
-                new Point(140, 35),
-                new Point(200, 75));
-        static double PERCENT_COLOR_THRESHOLD = 0.4;
+        @Override
+        public void onViewportTapped()
+        {
+            /*
+             * Note that this method is invoked from the UI thread
+             * so whatever we do here, we must do quickly.
+             */
+
+            int currentStageNum = stageToRenderToViewport.ordinal();
+
+            int nextStageNum = currentStageNum + 1;
+
+            if(nextStageNum >= stages.length)
+            {
+                nextStageNum = 0;
+            }
+
+            stageToRenderToViewport = stages[nextStageNum];
+        }
 
         /**
          * Called when a frame from the webcam is returned.  Processing and looking for the barcode
@@ -134,10 +163,7 @@ public class Vision
          * @return a Mat object which has been updated with the results of the calculation for the barcode.
          */
         @Override
-        public Mat processFrame(Mat input)
-        {
-            Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV); // can convert to YUV rather than RGB for better object detection
-            // return input;
+        public Mat processFrame(Mat input) {
 
             /**
              * Scaler creates target range of color
@@ -145,71 +171,115 @@ public class Vision
              * Y represents Saturation
              * Z represents a range of values
              */
-            Scalar lowHSV =  new Scalar(23, 50, 70);
-            Scalar highHSV = new Scalar(32, 255, 255);
-            // variables for yellow
+            Scalar green = new Scalar(0, 250, 0);
+            Scalar blue = new Scalar(0, 0, 255);
+            Scalar red = new Scalar(255, 0, 0);
+            contoursList.clear();
 
-            Core.inRange(mat, lowHSV, highHSV, mat);
+            int leftL = 20;
+            int leftR = 140;
+            int rightL = 280;
+            int rightR = 400;
 
-            Mat left = mat.submat(LEFT_ROI);
-            Mat right = mat.submat(RIGHT_ROI);
+            /*
+             * This pipeline finds the contours of yellow blobs such as the Gold Mineral
+             * from the Rover Ruckus game.
+             */
+            Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2YCrCb);
+            Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);
+            Imgproc.threshold(yCbCrChan2Mat, thresholdMat, 90, 255, Imgproc.THRESH_BINARY_INV);
 
-            double leftValue = Core.sumElems(left).val[0] / LEFT_ROI.area() / 255;
-            double rightValue = Core.sumElems(right).val[0] / RIGHT_ROI.area() / 25;
 
-            left.release();
-            right.release();
+            leftSum = Core.sumElems(thresholdMat.submat(96, 144, leftL, leftR)).val[0];
+            rightSum = Core.sumElems(thresholdMat.submat(96, 144, rightL, rightR)).val[0];
+            centerSum = Core.sumElems(thresholdMat.submat(96, 144, leftR, rightL)).val[0];
 
-            telemetry.addData("Left raw value", (int) Core.sumElems(left).val[0]);
-            telemetry.addData("Right raw value", (int) Core.sumElems(right).val[0]);
-            telemetry.addData("Left percentage", Math.round(leftValue * 100) + "%");
-            telemetry.addData("Right percentage", Math.round(rightValue * 100) + "%");
-
-            boolean  objLeft = leftValue > PERCENT_COLOR_THRESHOLD;
-            boolean objRight = rightValue > PERCENT_COLOR_THRESHOLD;
-
-            if(objLeft && objRight){
-                location = Location.NOT_FOUND;
-                telemetry.addData("Object Location", "not found");
+            if(leftSum > rightSum && leftSum > centerSum){
+                Imgproc.rectangle(
+                        input,
+                        new Point(
+                                leftL,
+                                85),
+                        new Point(
+                                leftR,
+                                170),
+                        blue, 4);
+                duckPosition = "LEFT";
+            } else if (centerSum > leftSum && centerSum > rightSum){
+                Imgproc.rectangle(
+                        input,
+                        new Point(
+                                leftR +10,
+                                85),
+                        new Point(
+                                rightL - 10,
+                                170),
+                        red, 4);
+                duckPosition = "CENTER";
+            } else {
+                Imgproc.rectangle(
+                        input,
+                        new Point(
+                                rightL,
+                                85),
+                        new Point(
+                                rightR,
+                                170),
+                        green, 4);
+                duckPosition = "RIGHT";
             }
-            else if(objLeft){
-                location = Location.RIGHT;
-                telemetry.addData("Object Location", "right");
-            } else{
-                location = Location.LEFT;
-                telemetry.addData("Object Location", "left");
-            }
-            telemetry.update();
+            /*switch (stageToRenderToViewport)
+            {
+                case YCbCr_CHAN2:
+                {
+                    return yCbCrChan2Mat;
+                }
 
-            Imgproc.cvtColor(mat, mat, Imgproc.COLOR_GRAY2RGB);
+                case THRESHOLD:
+                {
+                    return thresholdMat;
+                }
 
-            Scalar colorObj = new Scalar(255, 0, 0);
-            Scalar colorObject = new Scalar(0, 255, 0);
+                case CONTOURS_OVERLAYED_ON_FRAME:
+                {
+                    return contoursOnFrameMat;
+                }
 
-            Imgproc.rectangle(mat, LEFT_ROI, location == Location.LEFT? colorObject:colorObj);
-            Imgproc.rectangle(mat, RIGHT_ROI, location == Location.RIGHT? colorObject:colorObj);
+                case RAW_IMAGE:
+                {
+                    return input;
+                }
 
-            return mat;
+                default:
+                {
+                    return input;
+                }
+            }*/
+
+            Imgproc.rectangle(
+                    thresholdMat,
+                    new Point(
+                            input.cols()/4,
+                            input.rows()/4),
+                    new Point(
+                            input.cols()*(3f/4f),
+                            input.rows()*(3f/4f)),
+                    new Scalar(0, 255, 0), 4);
+            //return yCbCrChan2Mat;
+            return input;
+            //return thresholdMat;
+
         }
-
-
-
-
 
         /**
-         * Cycle through which stage of the pipeline is displayed on the screen when the screen is tapped.
+         * Returns the barcode read by the camera.
+         * @return int representing the barcode level: 1, 2, or 3
          */
-        @Override
-        public void onViewportTapped()
+        public String getDuckPosition()
         {
-            /*
-             * Note that this method is invoked from the UI thread
-             * so whatever we do here, we must do quickly.
-             */
+            return duckPosition;
         }
-
     }
-
-
 }
+
 

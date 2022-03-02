@@ -48,8 +48,14 @@ public class Teleop2 extends OpMode {
         //LINEAR SLIDE
         if (gamepad2.b) {
             robot.linear.extend();
-           } else if(gamepad2.a) {
+            if (!gamepad2.dpad_down && !gamepad2.dpad_up) {
+                robot.linear.basketMove(0.38);
+            }
+        } else if(gamepad2.a) {
             robot.linear.reverse();
+            if (!gamepad2.dpad_down && !gamepad2.dpad_up) {
+                robot.linear.basketMove(0.48);
+            }
         } else {
             robot.linear.stopExtend();
         }

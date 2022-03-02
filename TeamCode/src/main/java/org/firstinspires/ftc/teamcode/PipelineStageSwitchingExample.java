@@ -47,8 +47,7 @@ import java.util.List;
  * purposes. We also show how to get data from the pipeline to your OpMode.
  */
 @TeleOp
-public class PipelineStageSwitchingExample extends LinearOpMode
-{
+public class PipelineStageSwitchingExample extends LinearOpMode {
     OpenCvCamera phoneCam;
     StageSwitchingPipeline stageSwitchingPipeline;
 
@@ -63,7 +62,6 @@ public class PipelineStageSwitchingExample extends LinearOpMode
          */
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        //phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         phoneCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
         stageSwitchingPipeline = new StageSwitchingPipeline();
@@ -87,8 +85,7 @@ public class PipelineStageSwitchingExample extends LinearOpMode
 
         waitForStart();
 
-        while (opModeIsActive())
-        {
+        while (opModeIsActive()) {
             telemetry.addData("Num contours found", stageSwitchingPipeline.getNumContoursFound());
             telemetry.addData("leftSum", StageSwitchingPipeline.leftSum);
             telemetry.addData("rightSum", StageSwitchingPipeline.rightSum);
@@ -147,19 +144,16 @@ public class PipelineStageSwitchingExample extends LinearOpMode
         }
 
         @Override
-        public Mat processFrame(Mat input)
-        {
+        public Mat processFrame(Mat input) {
             Scalar green = new Scalar(0, 250, 0);
             Scalar blue = new Scalar(0, 0, 255);
             Scalar red = new Scalar(255, 0, 0);
             contoursList.clear();
 
-
             int leftL = 20;
             int leftR = 140;
             int rightL = 280;
             int rightR = 400;
-
 
             /*
              * This pipeline finds the contours of yellow blobs such as the Gold Mineral
@@ -232,11 +226,6 @@ public class PipelineStageSwitchingExample extends LinearOpMode
                     return input;
                 }
             }*/
-
-
-
-
-
 
             Imgproc.rectangle(
                     thresholdMat,
