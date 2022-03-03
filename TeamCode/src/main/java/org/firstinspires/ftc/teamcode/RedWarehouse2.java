@@ -4,23 +4,73 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.Thunderbot_2021;
+
 @Autonomous(name="RedWarehouse2", group="Auto")
-public class RedWarhouse2 extends OpMode {
+public class RedWarehouse2 extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
+    Vision vision = new Vision();
+    String duckPosition;
 
     public void init() {
         robot.init(hardwareMap, telemetry);
+        vision.init(hardwareMap, telemetry);
         telemetry.addData("Init Done:", "yes");
+    }
+
+    @Override
+    public void init_loop() {
+        telemetry.addData("Duck Position: ", vision.stageSwitchingPipeline.getDuckPosition());
+        duckPosition = vision.stageSwitchingPipeline.getDuckPosition();
     }
 
     public void start() {
         telemetry.addData("Start:", "pressed");
     }
+
     int state = 0;
     boolean done = false;
+    double extension1 = 0;
+    double extension2 = 0;
+    double retraction1 = 0;
+    double retraction2 = 0;
+    double placingPosition = 0;
+    double drop = 0;
+    double cmForward = 0;
+    double cmReverse = 0;
 
     @Override
-    public void loop () {
+    public void loop() {
+        telemetry.addData("state", state);
+        if (duckPosition == "RIGHT") {
+            extension1 = 65;
+            extension2 = 0;
+            retraction1 = 0;
+            retraction2 = 65;
+            placingPosition = 0.1;
+            drop = 0.4;
+            cmForward = 35;
+            cmReverse = 5;
+        } else if (duckPosition == "LEFT") {
+            extension1 = 45;
+            extension2 = 45;
+            retraction1 = 45;
+            retraction2 = 45;
+            placingPosition = 0;
+            drop = 0.25;
+            cmForward = 50;
+            cmReverse = 16;
+        } else {
+            extension1 = 45;
+            extension2 = 0;
+            retraction1 = 0;
+            retraction2 = 45;
+            placingPosition = 0;
+            drop = 0.25;
+            cmForward = 40;
+            cmReverse = 6;
+        }
+
         switch (state) {
             case 0:
                 if (!done) {
@@ -31,10 +81,9 @@ public class RedWarhouse2 extends OpMode {
                     state++;
                 }
                 break;
-
-            case 1: //Variable
+            case 1:
                 if (!done) {
-                    done = robot.linear.extendSlide(45, 0.5);
+                    done = robot.linear.extendSlide(extension1, 0.5);
                 } else {
                     robot.linear.stopExtend();
                     resetStartTime();
@@ -44,7 +93,7 @@ public class RedWarhouse2 extends OpMode {
                 break;
             case 2:
                 if (getRuntime() < 1) {
-                    robot.linear.servoTurn(0);
+                    robot.linear.servoTurn(placingPosition);
                 } else {
                     resetStartTime();
                     done = false;
@@ -54,7 +103,7 @@ public class RedWarhouse2 extends OpMode {
 
             case 3:
                 if (!done) {
-                    done = robot.linear.retractSlide(45, 0.5);
+                    done = robot.linear.retractSlide(retraction1, 0.5);
                 } else {
                     robot.linear.stopExtend();
                     done = false;
@@ -63,7 +112,7 @@ public class RedWarhouse2 extends OpMode {
                 break;
             case 4:
                 if (!done) {
-                    done = robot.drive(180, 50, 0.2);
+                    done = robot.drive(180, cmForward, 0.2);
                 } else {
                     robot.stop();
                     resetStartTime();
@@ -73,7 +122,7 @@ public class RedWarhouse2 extends OpMode {
                 break;
             case 5:
                 if (getRuntime() < 1) {
-                    robot.linear.basketMove(0.25);
+                    robot.linear.basketMove(drop);
                 } else {
                     done = false;
                     state++;
@@ -81,7 +130,7 @@ public class RedWarhouse2 extends OpMode {
                 break;
             case 6:
                 if (!done) {
-                    done = robot.drive(0, 16, 0.5);
+                    done = robot.drive(0, cmReverse, 0.5);
                 } else {
                     robot.stop();
                     done = false;
@@ -91,7 +140,7 @@ public class RedWarhouse2 extends OpMode {
 
             case 7:
                 if (!done) {
-                    done = robot.linear.extendSlide(45, 0.5);
+                    done = robot.linear.extendSlide(extension2, 0.5);
                 } else {
                     robot.linear.stopExtend();
                     resetStartTime();
@@ -112,7 +161,7 @@ public class RedWarhouse2 extends OpMode {
 
             case 9:
                 if (!done) {
-                    done = robot.linear.retractSlide(45  , 0.5);
+                    done = robot.linear.retractSlide(retraction2, 0.5);
                 } else {
                     robot.linear.stopExtend();
                     done = false;
@@ -121,7 +170,7 @@ public class RedWarhouse2 extends OpMode {
                 break;
             case 10:
                 if (!done) {
-                    done = robot.turnTo(70, 0.25);
+                    done = robot.turnTo(74, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -142,5 +191,4 @@ public class RedWarhouse2 extends OpMode {
                 break;
         }
     }
-
 }

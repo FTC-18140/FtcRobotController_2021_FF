@@ -6,11 +6,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Thunderbot_2021;
 
-@Autonomous(name="CV", group="Auto")
-public class CVauto extends OpMode {
+@Autonomous(name="RedStorage", group="Auto")
+public class RedStorage extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
     Vision vision = new Vision();
     String duckPosition;
+
     public void init() {
         robot.init(hardwareMap, telemetry);
         vision.init(hardwareMap, telemetry);
@@ -18,7 +19,7 @@ public class CVauto extends OpMode {
     }
 
     @Override
-    public void init_loop(){
+    public void init_loop() {
         telemetry.addData("Duck Position: ", vision.stageSwitchingPipeline.getDuckPosition());
         duckPosition = vision.stageSwitchingPipeline.getDuckPosition();
     }
@@ -30,7 +31,7 @@ public class CVauto extends OpMode {
     int state = -1;
     boolean done = false;
     double extension1 = 0;
-    double extension2 =0;
+    double extension2 = 0;
     double retraction1 = 0;
     double retraction2 = 0;
     double placingPosition = 0;
@@ -41,7 +42,7 @@ public class CVauto extends OpMode {
     @Override
     public void loop() {
         telemetry.addData("state", state);
-        if(duckPosition == "RIGHT"){
+        if (duckPosition == "RIGHT") {
             extension1 = 65;
             extension2 = 0;
             retraction1 = 0;
@@ -50,7 +51,7 @@ public class CVauto extends OpMode {
             drop = 0.4;
             cmForward = 35;
             cmReverse = 5;
-        } else if (duckPosition == "LEFT"){
+        } else if (duckPosition == "LEFT") {
             extension1 = 45;
             extension2 = 45;
             retraction1 = 45;
