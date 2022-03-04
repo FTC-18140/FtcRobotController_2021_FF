@@ -48,9 +48,9 @@ public class Teleop2 extends OpMode {
         //LINEAR SLIDE
         if (gamepad2.b) {
             robot.linear.extend();
-            if (!gamepad2.dpad_down && !gamepad2.dpad_up) {
+            /*if (!gamepad2.dpad_down && !gamepad2.dpad_up) {
                 robot.linear.basketMove(0.38);
-            }
+            }*/
         } else if(gamepad2.a) {
             robot.linear.reverse();
             if (!gamepad2.dpad_down && !gamepad2.dpad_up) {
@@ -73,11 +73,11 @@ public class Teleop2 extends OpMode {
         position2 = robot.linear.linearSlideServoR.getPosition();
 
         if (gamepad2.dpad_down) {
-            position2 = position2 + 0.01;
+            position2 = position2 + 1;
             position2 = Range.clip(position2, 0, 1);
             robot.linear.servoTurn(position2);
         } else if (gamepad2.dpad_up) {
-            position2 = position2 - 0.01;
+            position2 = position2 - 1;
             position2 = Range.clip(position2, 0, 1);
             robot.linear.servoTurn(position2);
         }

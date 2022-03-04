@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Thunderbot_2021;
 
-@Autonomous(name="RedStorage", group="Auto")
+@Autonomous(name="RedStorage2", group="Auto")
 public class RedStorage extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
     Vision vision = new Vision();

@@ -26,14 +26,14 @@ public class AutoRed extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    done = robot.drive(135, 20, 0.25);
+                    done = robot.gyroDrive(90, 300, 0.25);
                 } else {
                     robot.stop();
                     done = false;
                     state++;
                 }
                 break;
-            case 1:
+            /*case 1:
                 if (!done) {
                     done = robot.turnTo(-160, 0.25);
                 } else {
@@ -172,7 +172,7 @@ public class AutoRed extends OpMode {
                     done = false;
                     state++;
                 }
-                break;
+                break;*/
             default:
                 break;
         }
