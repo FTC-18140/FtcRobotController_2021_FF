@@ -184,7 +184,7 @@ public class Thunderbot_2021 {
         double xValue = Math.sin(toRadians(direction)) * power;
         double yValue = Math.cos(toRadians(direction)) * power;
         double currentAngle = updateHeading();
-        telemetry.addData("current angle", updateHeading());
+        telemetry.addData("current angle", currentAngle);
         telemetry.update();
 
         // Set initial angle and position
@@ -307,7 +307,7 @@ public class Thunderbot_2021 {
 
             // Updates current angle
             currentAngle = updateHeading();
-            telemetry.addData("current angle", updateHeading());
+            telemetry.addData("current angle", currentAngle);
             telemetry.update();
 
             if (0 > degrees){
@@ -342,7 +342,7 @@ public class Thunderbot_2021 {
 
         // Updates current angle
         currentAngle = updateHeading();
-        telemetry.addData("current angle", updateHeading());
+        telemetry.addData("current angle", currentAngle);
 
         if(10 > Math.abs(currentAngle - degrees)){
             //power = power * ((Math.abs(currentAngle) - Math.abs(degrees))/100);
