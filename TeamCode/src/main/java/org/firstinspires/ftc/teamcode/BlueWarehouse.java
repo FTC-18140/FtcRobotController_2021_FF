@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Thunderbot_2021;
 
-@Autonomous(name="CV", group="Auto")
-public class CVauto extends OpMode {
+@Autonomous(name="BlueWarehouse", group="Auto")
+public class BlueWarehouse extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
     Vision vision = new Vision();
     String duckPosition;

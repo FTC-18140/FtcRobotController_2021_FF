@@ -45,26 +45,36 @@ public class Teleop extends OpMode {
         telemetry.addData("rx", gamepad1.right_stick_x);
         telemetry.addData("ry", gamepad1.right_stick_y);
 
+
+        // COLOR SENSOR CODE
+        if(robot.linear.color.red() > 500) {
+            telemetry.addData("Cube: ", "true");
+            gamepad2.rumble(1000);
+            gamepad1.rumble(1000);
+        } else {
+            telemetry.addData("Cube: ", "false");
+        }
+
         //LINEAR SLIDE
-        if (gamepad2.b) {
+        if (gamepad2.a) {
             robot.linear.extend();
-            /*if (!gamepad2.dpad_down && !gamepad2.dpad_up) {
-                robot.linear.basketMove(0.38);
-            }*/
-        } else if(gamepad2.a) {
-            robot.linear.reverse();
             if (!gamepad2.dpad_down && !gamepad2.dpad_up) {
                 robot.linear.basketMove(0.48);
             }
+        } else if(gamepad2.b) {
+            robot.linear.reverse();
+            /*if (!gamepad2.dpad_down && !gamepad2.dpad_up) {
+                robot.linear.basketMove(0.38);
+            }*/
         } else {
             robot.linear.stopExtend();
         }
 
         //INTAKE
         if (gamepad2.x) {
-            robot.intake.intakeMove(-0.9);
+            robot.intake.intakeMove(-1);
         } else if (gamepad2.y) {
-            robot.intake.intakeMove(0.9);
+            robot.intake.intakeMove(1);
         } else {
            robot.intake.intakeStop();
             }
@@ -73,7 +83,7 @@ public class Teleop extends OpMode {
         position2 = robot.linear.linearSlideServoR.getPosition();
 
         if (gamepad2.dpad_down) {
-            position2 = position2 + 1;
+            position2 = position2 + 0.1;
             position2 = Range.clip(position2, 0, 1);
             robot.linear.servoTurn(position2);
         } else if (gamepad2.dpad_up) {

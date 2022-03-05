@@ -4,6 +4,7 @@ import static com.qualcomm.robotcore.hardware.Servo.Direction.REVERSE;
 import static java.lang.Math.abs;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -19,6 +20,7 @@ public class LinearSlide {
     Servo linearSlideServoL = null;
     Servo linearSlideServoR = null;
     Servo basketServo = null;
+    ColorSensor color = null;
     HardwareMap hwMap = null;
 
     static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
@@ -59,10 +61,13 @@ public class LinearSlide {
         linearSlideServoL.setPosition(1);
         linearSlideServoR.setPosition(1);
         basketServo.setPosition(0.38);
+
+        color = hwMap.colorSensor.get("color");
     }
 
     double initial = 0;
     boolean moving = false;
+
     public boolean retractSlide(double distance, double power) {
         if (!moving) {
             initial = linearSlide.getCurrentPosition();
@@ -102,32 +107,36 @@ public class LinearSlide {
         }
     }
 
-        public void stopExtend () {
-            linearSlide.setPower(0);
-        }
-        public void extend() {
-            linearSlide.setPower(1);
-        }
-        public void reverse() {
-            linearSlide.setPower(-1);
-        }
-        public void servoTurn(double position) {
+    public void stopExtend() {
+        linearSlide.setPower(0);
+    }
+
+    public void reverse() {
+        linearSlide.setPower(1);
+    }
+
+    public void extend() {
+        linearSlide.setPower(-1);
+    }
+
+    public void servoTurn(double position) {
         linearSlideServoL.setPosition(position);
         linearSlideServoR.setPosition(position);
         basketServo.setPosition(position * 0.4);
 
         telemetry.addData("Position in servoTurn: ", linearSlideServoR.getPosition());
     }
+
     public void basketMove(double position) {
         basketServo.setPosition(position);
         telemetry.addData("wrist servo", basketServo.getPosition());
     }
 
-    public void holding (){
+    public void holding() {
         servoTurn(0.18);
     }
 
-    public boolean dropping () {
+    public boolean dropping() {
         boolean allDone = false;
         switch (state) {
             case 0:
@@ -165,6 +174,7 @@ public class LinearSlide {
         }
         return allDone;
     }
+
     public double getRuntime() {
         final double NANOSECONDS_PER_SECOND = TimeUnit.SECONDS.toNanos(1);
         return (System.nanoTime() - startTime) / NANOSECONDS_PER_SECOND;
@@ -175,5 +185,12 @@ public class LinearSlide {
      */
     public void resetStartTime() {
         startTime = System.nanoTime();
+    }
+
+    public void colorRead() {
+        telemetry.addData("red:", color.red());
+        telemetry.addData("blue:", color.blue());
+        telemetry.addData("green:", color.green());
+        telemetry.update();
     }
 }
