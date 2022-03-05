@@ -73,7 +73,7 @@ public class BlueStorage extends OpMode {
         switch (state) {
             case 0:
                 if (!done) {
-                    done = robot.drive(90, 50, 0.2);
+                    done = robot.drive(94, 50, 0.2);
                 } else {
                     robot.stop();
                     done = false;
@@ -111,7 +111,7 @@ public class BlueStorage extends OpMode {
                 break;
             case 4:
                 if (!done) {
-                    done = robot.drive(180, cmForward, 0.2);
+                    done = robot.gyroDrive(0, cmForward, -0.2);
                 } else {
                     robot.stop();
                     resetStartTime();
@@ -129,7 +129,7 @@ public class BlueStorage extends OpMode {
                 break;
             case 6:
                 if (!done) {
-                    done = robot.drive(0, cmReverse, 0.5);
+                    done = robot.gyroDrive(0, cmReverse, 0.5);
                 } else {
                     robot.stop();
                     done = false;
@@ -169,7 +169,7 @@ public class BlueStorage extends OpMode {
                 break;
             case 10:
                 if (!done) {
-                    done = robot.turnTo(85, 0.25);
+                    done = robot.turnTo(88, 0.25);
                 } else {
                     robot.stop();
                     done = false;
@@ -179,7 +179,7 @@ public class BlueStorage extends OpMode {
 
             case 11:
                 if (!done) {
-                    done = robot.gyroDrive(85, 120, -0.2);
+                    done = robot.gyroDrive(88, 120, -0.2);
                 } else {
                     robot.stop();
                     resetStartTime();
@@ -189,7 +189,7 @@ public class BlueStorage extends OpMode {
                 break;
             case 12:
                 if (!done) {
-                    done = robot.drive(-90, 4, 0.2);
+                    done = true;//robot.drive(-90, 4, 0.2);
                 } else {
                     robot.stop();
                     resetStartTime();

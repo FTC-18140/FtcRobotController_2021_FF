@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Thunderbot_2021;
 
-@Autonomous(name="RedStorage2", group="Auto")
+@Autonomous(name="RedStorage", group="Auto")
 public class RedStorage extends OpMode {
     Thunderbot_2021 robot = new Thunderbot_2021();
     Vision vision = new Vision();
@@ -58,8 +58,8 @@ public class RedStorage extends OpMode {
             retraction2 = 45;
             placingPosition = 0;
             drop = 0.25;
-            cmForward = 42;
-            cmReverse = 12;
+            cmForward = 40;
+            cmReverse = 10;
         } else {
             extension1 = 45;
             extension2 = 0;
@@ -67,14 +67,14 @@ public class RedStorage extends OpMode {
             retraction2 = 45;
             placingPosition = 0;
             drop = 0.25;
-            cmForward = 37;
-            cmReverse = 7;
+            cmForward = 35;
+            cmReverse = 5;
         }
 
         switch (state) {
             case -1:
                 if (!done) {
-                    done = robot.drive(-90, 40, 0.2);
+                    done = robot.drive(-94, 40, 0.2);
                 } else {
                     robot.stop();
                     resetStartTime();
@@ -122,7 +122,7 @@ public class RedStorage extends OpMode {
                 break;
             case 4:
                 if (!done) {
-                    done = robot.drive(180, cmForward, 0.2);
+                    done = robot.gyroDrive(20, cmForward, -0.2);
                 } else {
                     robot.stop();
                     resetStartTime();
@@ -140,7 +140,7 @@ public class RedStorage extends OpMode {
                 break;
             case 6:
                 if (!done) {
-                    done = robot.drive(0, cmReverse, 0.5);
+                    done = robot.gyroDrive(20, cmReverse, 0.5);
                 } else {
                     robot.stop();
                     done = false;
@@ -190,7 +190,7 @@ public class RedStorage extends OpMode {
 
             case 11:
                 if (!done) {
-                    done = robot.drive(0, 90, 0.2);
+                    done = robot.gyroDrive(82, 94, 0.2);
                 } else {
                     robot.stop();
                     resetStartTime();
@@ -209,7 +209,7 @@ public class RedStorage extends OpMode {
                 break;
             case 13:
                 if (!done) {
-                    done = robot.drive(180, 14, 0.1);
+                    done = robot.gyroDrive(170, 16, -0.1);
                 } else {
                     resetStartTime();
                     robot.stop();
@@ -228,7 +228,7 @@ public class RedStorage extends OpMode {
                 break;
             case 15:
                 if (!done) {
-                    done = robot.drive(-10, 56, 0.1);
+                    done = robot.gyroDrive(170, 50, 0.2);
                 } else {
                     resetStartTime();
                     robot.stop();
