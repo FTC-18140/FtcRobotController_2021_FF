@@ -184,7 +184,7 @@ public class Thunderbot_2021 {
         double xValue = Math.sin(toRadians(direction)) * power;
         double yValue = Math.cos(toRadians(direction)) * power;
         double currentAngle = updateHeading();
-        telemetry.addData("current angle", updateHeading());
+        telemetry.addData("current angle", currentAngle);
         telemetry.update();
 
         // Set initial angle and position
@@ -194,6 +194,7 @@ public class Thunderbot_2021 {
                 initialPosition = leftFront.getCurrentPosition();
             } else {
                 initialPosition = rightFront.getCurrentPosition();
+
             }
             moving = true;
         }
@@ -227,7 +228,69 @@ public class Thunderbot_2021 {
     }
     double startAngle = 0;
     double currentAngle = 0;
-/**
+
+    public boolean gyroDrive (double direction, double distance, double power) {
+
+        double currentAngle = updateHeading();
+        telemetry.addData("current angle", currentAngle);
+
+// Set desired angle and initial position
+        if(!moving){
+            gyStartAngle = direction;
+// If my intended direction to drive is negative, and it's close enough to -180 to be worried,
+// add 360 degrees to it. This will prevent the angle from rolling over to +/-180.
+// For example, if my desired direction is -165, I would add 360 to that, and my new
+// desired direction would be 195.
+            if (gyStartAngle < 0.0 && Math.abs(gyStartAngle) > 130.0 )
+            {
+                gyStartAngle = gyStartAngle + 360;
+            }
+
+            if(direction == 45) {
+// the rightFront wheel doesn't move at a desired direction of 45 degrees
+                initialPosition = leftFront.getCurrentPosition();
+            } else {
+                initialPosition = rightFront.getCurrentPosition();
+            }
+            moving = true;
+        }
+
+        double position;
+        if(direction == 45){
+            position = abs(leftFront.getCurrentPosition() - initialPosition);
+        } else{
+            position = abs(rightFront.getCurrentPosition() - initialPosition);
+        }
+        double positionInCM = position/COUNTS_PER_CM;
+        telemetry.addData("position", position);
+
+        if (Math.abs(gyStartAngle) > 130 && currentAngle < 0.0)
+        {
+// Prevent the rollover of the currentAngle
+            currentAngle += 360;
+        }
+
+// calculates required speed to adjust to gyStartAngle
+        double adjust = (gyStartAngle - currentAngle ) / 100;
+// Setting range of adjustments
+        adjust = Range.clip(adjust, -1, 1);
+
+// Stops when at the specified distance
+        if(positionInCM >= distance){
+            stop();
+            moving = false;
+            return true;
+
+// Continues if not at the specified distance
+        } else {
+
+            joystickDrive(power, 0, adjust);
+            return false;
+        }
+    }
+
+
+    /**
  * Turns an Exact Angle in Degrees Using The Gyro
  * @param degrees - Angle The Robot Will Turn
  * @param power - Speed The Robot will Turn
@@ -244,7 +307,7 @@ public class Thunderbot_2021 {
 
             // Updates current angle
             currentAngle = updateHeading();
-            telemetry.addData("current angle", updateHeading());
+            telemetry.addData("current angle", currentAngle);
             telemetry.update();
 
             if (0 > degrees){
@@ -279,7 +342,7 @@ public class Thunderbot_2021 {
 
         // Updates current angle
         currentAngle = updateHeading();
-        telemetry.addData("current angle", updateHeading());
+        telemetry.addData("current angle", currentAngle);
 
         if(10 > Math.abs(currentAngle - degrees)){
             //power = power * ((Math.abs(currentAngle) - Math.abs(degrees))/100);
