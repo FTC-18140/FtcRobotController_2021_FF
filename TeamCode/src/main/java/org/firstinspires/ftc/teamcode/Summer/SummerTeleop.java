@@ -4,8 +4,6 @@ package org.firstinspires.ftc.teamcode.Summer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Summer.SummerBot;
-
 
 /**
  * This class provides basic Telop driving for a Summerbot robot.
@@ -14,11 +12,6 @@ import org.firstinspires.ftc.teamcode.Summer.SummerBot;
  * This OpMode uses the common SummerBot hardware class to define the devices on the robot.
  * All device access is managed through the SummerBot class.
  */
-
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.Summer.SummerBot;
 
 @TeleOp(name="Teleop", group="Summer")
 public class SummerTeleop extends OpMode
@@ -65,7 +58,7 @@ public class SummerTeleop extends OpMode
         right = gamepad1.left_stick_x;
         clockwise = gamepad1.right_stick_x;
 
-        robot.drive(forward, clockwise, right);
+        robot.joystickDrive(forward, clockwise, right);
 
         telemetry.addData("forward: ",  "%.2f", forward);
         telemetry.addData("right: ", "%.2f", right);

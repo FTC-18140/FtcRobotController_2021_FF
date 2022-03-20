@@ -29,9 +29,21 @@
 
 package org.firstinspires.ftc.teamcode.Summer;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+import java.util.List;
 
 import static java.lang.Math.abs;
 
@@ -45,12 +57,36 @@ import static java.lang.Math.abs;
 public class SummerBot
 {
     /* Motors used in the robot chassis */
-    public DcMotor leftFront = null;
-    public DcMotor rightFront = null;
-    public DcMotor leftRear = null;
-    public DcMotor rightRear = null;
+    public DcMotorEx leftFront = null;
+    public DcMotorEx rightFront = null;
+    public DcMotorEx leftRear = null;
+    public DcMotorEx rightRear = null;
+
+    BNO055IMU imu = null;
 
     HardwareMap hwMap =  null;
+    Telemetry telemetry = null;
+
+    boolean moving = false;
+    double gyStartAngle = 0;
+    double initialPosition = 0;
+
+    // converts inches to motor ticks
+    static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
+    static final double DRIVE_GEAR_REDUCTION = 20;
+    static final double WHEEL_DIAMETER_INCHES = 4.0; // For figuring circumference
+    static final double WHEEL_DIAMETER_CM = (WHEEL_DIAMETER_INCHES * 2.54);
+    static final double COUNTS_PER_CM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION)
+            / (WHEEL_DIAMETER_CM * 3.1415);
+
+    // Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
+    List<LynxModule> allHubs = null;
+
+    /**
+     * PathFollower object - used to give the robot the ability to follow a sequence of
+     * points defined beforehand.
+     */
+    PathFollower pursuit = new PathFollower( new PVector(0,0), 10, 10);
 
     /**
      *  Constructor
@@ -63,16 +99,17 @@ public class SummerBot
     /**
      *  Initialize the hardware using the reference to the HardwareMap.
      */
-    public void init(HardwareMap ahwMap)
+    public void init(HardwareMap ahwMap, Telemetry telem)
     {
         // Save reference to Hardware map
         hwMap = ahwMap;
+        telemetry = telem;
 
         // Define and Initialize Motors
-        leftFront = hwMap.get(DcMotor.class, "lf");
-        rightFront = hwMap.get(DcMotor.class, "rf");
-        leftRear = hwMap.get(DcMotor.class, "lr");
-        rightRear = hwMap.get(DcMotor.class, "rr");
+        leftFront = hwMap.get(DcMotorEx.class, "lf");
+        rightFront = hwMap.get(DcMotorEx.class, "rf");
+        leftRear = hwMap.get(DcMotorEx.class, "lr");
+        rightRear = hwMap.get(DcMotorEx.class, "rr");
 
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
@@ -93,6 +130,38 @@ public class SummerBot
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        try
+        {
+            // Set up the parameters with which we will use our IMU. Note that integration
+            // algorithm here just reports accelerations to the logcat log; it doesn't actually
+            // provide positional information.
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+            parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+            parameters.loggingEnabled = true;
+            parameters.loggingTag = "IMU";
+            parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+            // Retrieve and initialize the IMU.
+            imu = hwMap.get(BNO055IMU.class, "imu");
+            imu.initialize(parameters);
+        }
+        catch (Exception p_exeception)
+        {
+            telemetry.addData("imu not found in config file", 0);
+            imu = null;
+        }
+
+        // Get access to a list of Expansion Hub Modules to enable changing caching methods.
+        List<LynxModule> allHubs = hwMap.getAll(LynxModule.class);
+
+        // Set all Expansion hubs to use the MANUAL Bulk Caching mode
+        for (LynxModule module : allHubs)
+        {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
     }
 
     /**
@@ -101,7 +170,7 @@ public class SummerBot
      * @param right - Any movement from left to right
      * @param clockwise - Any turning movements
      */
-    public void drive(double foward, double right, double clockwise)
+    public void joystickDrive(double foward, double right, double clockwise)
     {
         double frontLeft = foward + clockwise + right;
         double frontRight = foward - clockwise - right;
@@ -109,16 +178,20 @@ public class SummerBot
         double backRight = foward - clockwise + right;
 
         double max = abs(frontLeft);
-        if (abs(frontRight) > max) {
+        if (abs(frontRight) > max)
+        {
             max = abs(frontRight);
         }
-        if (abs(backLeft) > max) {
+        if (abs(backLeft) > max)
+        {
             max = abs(backLeft);
         }
-        if (abs(backRight) > max) {
+        if (abs(backRight) > max)
+        {
             max = abs(backRight);
         }
-        if (max > 1) {
+        if (max > 1)
+        {
             frontLeft /= max;
             frontRight /= max;
             backLeft /= max;
@@ -132,6 +205,83 @@ public class SummerBot
     }
 
     /**
+     * gyroDrive - drive at a particular heading
+     * @return boolean value indicating the drive is complete
+     */
+
+    public boolean gyroDrive (double direction, double distance, double power)
+    {
+
+        double currentAngle = updateHeading();
+        telemetry.addData("current angle", currentAngle);
+
+        // Set desired angle and initial position
+        if( !moving )
+        {
+            gyStartAngle = direction;
+            // If my intended direction to drive is negative, and it's close enough to -180 to be worried,
+            // add 360 degrees to it. This will prevent the angle from rolling over to +/-180.
+            // For example, if my desired direction is -165, I would add 360 to that, and my new
+            // desired direction would be 195.
+            if (gyStartAngle < 0.0 && Math.abs(gyStartAngle) > 130.0 )
+            {
+                gyStartAngle = gyStartAngle + 360;
+            }
+
+            if(direction == 45)
+            {
+                // the rightFront wheel doesn't move at a desired direction of 45 degrees
+                initialPosition = leftFront.getCurrentPosition();
+            }
+            else
+            {
+                initialPosition = rightFront.getCurrentPosition();
+            }
+            moving = true;
+        }
+
+        double position;
+        if(direction == 45)
+        {
+            position = abs(leftFront.getCurrentPosition() - initialPosition);
+        }
+        else
+        {
+            position = abs(rightFront.getCurrentPosition() - initialPosition);
+        }
+
+        double positionInCM = position/COUNTS_PER_CM;
+        telemetry.addData("position", position);
+
+        if (Math.abs(gyStartAngle) > 130 && currentAngle < 0.0)
+        {
+            // Prevent the rollover of the currentAngle
+            currentAngle += 360;
+        }
+
+        // calculates required speed to adjust to gyStartAngle
+        double adjust = (gyStartAngle - currentAngle ) / 100;
+        // Setting range of adjustments
+        adjust = Range.clip(adjust, -1, 1);
+
+        // Stops when at the specified distance
+        if(positionInCM >= distance)
+        {
+            stop();
+            moving = false;
+            return true;
+        }
+        else
+        {
+            // Continues if not at the specified distance
+            joystickDrive(power, 0, adjust);
+            return false;
+        }
+    }
+
+
+
+    /**
      * This method sets all motor power to 0, causing the robot to stop.
      */
     public void stop()
@@ -142,5 +292,90 @@ public class SummerBot
         rightRear.setPower(0);
     }
 
- }
+    /**
+     * Robot - Queries the REV Hub using bulk data transfer.  Updates
+     * the heading and position values .
+     */
+    public void update()
+    {
+        // Important Step 4: If you are using MANUAL mode, you must clear the BulkCache once per control cycle
+        for (LynxModule module : allHubs)
+        {
+            module.clearBulkCache();
+        }
+
+        updateVelocity(this.getVelocity());
+        updatePosition(this.getLocationChange());
+
+
+    }
+
+    /**
+     * Robot - command the Chassis to move according to the desired linear velocity and spin calculated
+     * by the pursuit code.
+     * @param neededVelocity PVector that indicates the linear velocity needed by the robot to continue pursuit
+     * @param spin double indicating the angular velocity needed by the robot to continue pursuit
+     */
+    public void updateMotors(PVector neededVelocity, double spin)
+    {
+        // Fix this next line.  The robot should tank drive for TBD.
+        // neededVelocity.rotate((float)Math.toRadians( getHeadingPursuit() ));
+        double x = neededVelocity.x / 40.0; //bot.maxSpeed; //max speed is 31.4 in/sec
+        double y = neededVelocity.y / 40.0; // bot.maxSpeed;
+
+//        telemetry.addData("x encoder: ", xEncoder.getCurrentPosition());
+//        telemetry.addData("y encoder: ", yEncoder.getCurrentPosition());
+        telemetry.addData("SbfJoystick x, y: ", "%.3f, %.3f", x, y );
+
+        double turn = spin / 343;
+
+        joystickDrive(x, y, turn );
+    }
+
+    /**
+     * Get the heading in whatever means you are implementing.  Right now, use the imu.
+     * @return heading in degrees
+     */
+    public double updateHeading()
+    {
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
+    }
+
+    /** Update the current location of the robot.
+     * @param currentPosition The position being added to location.
+     * */
+    public void updatePosition(PVector currentPosition)
+    {
+        pursuit.location = PVector.add(pursuit.location, currentPosition);
+    }
+
+    /**
+     * Update the current velocity.
+     * @param currentVelocity  The velocity being set.
+     */
+    public void updateVelocity(PVector currentVelocity)
+    {
+        pursuit.velocity.set(currentVelocity.x, currentVelocity.y);
+    }
+
+    /**
+     * Robot - Get the robot's current linear velocity
+     * @return PVector which captures the current x,y velocity of the robot.
+     */
+    public PVector getVelocity()
+    {
+        return new PVector(getXLinearVelocity(), getYLinearVelocity());
+    }
+
+    /**
+     * Robot - calculate the amount of distance the robot has travelled since the last time this was called
+     * @return PVector indicating the number of inches traveled in x,y
+     */
+    public PVector getLocationChange()
+    {
+        return new PVector(getXChange(), getYChange());
+    }
+
+}
 
