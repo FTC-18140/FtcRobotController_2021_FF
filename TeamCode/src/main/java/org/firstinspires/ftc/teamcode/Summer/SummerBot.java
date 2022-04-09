@@ -79,6 +79,45 @@ public class SummerBot
     static final double COUNTS_PER_CM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION)
             / (WHEEL_DIAMETER_CM * 3.1415);
 
+    /**
+     * Robot - Encoder information used in odometry
+     */
+    /** An x-axis velocity measurement. */
+    private double xEncInPerSec;
+    /** A y-axis velocity measurement. */
+    private double yEncInPerSec;
+    /** The radius of the encoder wheels. */
+    private final double encWheelRadius = 1.96/2.0; //in inches ... encoder is a 50mm diameter wheel.
+//    private final double encTickPerRotation = 2400;
+    /** The number of encoder ticks per rotation of the encoder wheel. */
+    private final double encTickPerRotation = 3200;
+//    public static double encDistanceConstant = 195.5/192; //calibrated over 16' & 12' on foam tiles -- 9/13/19
+    /** A constant used in calculating robot position change. */
+    public static double encDistanceConstant = 1;
+    /** The number of inches moved per rotation of the encoder wheel. */
+    private final double encInchesPerRotation = 2.0 * encWheelRadius * Math.PI * encDistanceConstant; // this is the encoder wheel distancd
+    /** The gearing on the drive train. */
+    private final double gearRatio = 1.733333333;
+    /** The number of encoder ticks per inch moved. */
+    private final double encTicksPerInch = encTickPerRotation / (encInchesPerRotation);
+
+    /** Used to calculate the change in x position. */
+    private int prevXEncoder = 0;
+    /** Used to calculate the change in y position. */
+    private int prevYEncoder = 0;
+    /** Stores the change in x position. */
+    private int xEncoderChange = 0;
+    /** Stores the change in y position. */
+    private int yEncoderChange = 0;
+
+    /**
+     * Robot - Odometry Items
+     */
+    /** Declares the xEncoder as an expanded rev hub motor. */
+    private DcMotorEx xEncoder = null;
+    /** Declares the yEncoder as an expanded rev hub motor. */
+    private DcMotorEx yEncoder = null;
+
     // Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
     List<LynxModule> allHubs = null;
 
@@ -162,6 +201,41 @@ public class SummerBot
         {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
+    }
+
+    /**
+     *Queries the REV Hub using bulk data transfer.  Updates
+     * the heading and position values.
+     */
+    public void update()
+    {
+        // Important Step 4: If you are using MANUAL mode, you must clear the BulkCache once per control cycle
+        for (LynxModule module : allHubs)
+        {
+            module.clearBulkCache();
+        }
+
+        /*
+         * Update the velocity as read by the encoders
+         */
+        double xEncTicksPerSecond = xEncoder.getVelocity() / gearRatio;
+        double yEncTicksPerSecond = yEncoder.getVelocity() / gearRatio;
+
+        xEncInPerSec = xEncTicksPerSecond / encTicksPerInch;
+        yEncInPerSec = yEncTicksPerSecond / encTicksPerInch;
+
+        /*
+         * Update the position change since the last time as read by the encoders
+         */
+        xEncoderChange = xEncoder.getCurrentPosition() - prevXEncoder;
+        yEncoderChange = yEncoder.getCurrentPosition() - prevYEncoder;
+
+        updateVelocity(this.getVelocity());
+        updatePosition(this.getLocationChange());
+
+        /* store the current value to use as the previous value the next time around */
+        prevXEncoder = xEncoder.getCurrentPosition();
+        prevYEncoder = yEncoder.getCurrentPosition();
     }
 
     /**
@@ -292,23 +366,7 @@ public class SummerBot
         rightRear.setPower(0);
     }
 
-    /**
-     * Robot - Queries the REV Hub using bulk data transfer.  Updates
-     * the heading and position values .
-     */
-    public void update()
-    {
-        // Important Step 4: If you are using MANUAL mode, you must clear the BulkCache once per control cycle
-        for (LynxModule module : allHubs)
-        {
-            module.clearBulkCache();
-        }
 
-        updateVelocity(this.getVelocity());
-        updatePosition(this.getLocationChange());
-
-
-    }
 
     /**
      * Robot - command the Chassis to move according to the desired linear velocity and spin calculated
@@ -351,6 +409,27 @@ public class SummerBot
     }
 
     /**
+     * Calculate the amount of X distance the robot has travelled since the last time this was called
+     * @return float indicating the number of inches traveled
+     */
+    private float getXChange()
+    {
+        double inchesX = (((xEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.cos(Math.toRadians(updateHeading())) +
+                (((yEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.sin(Math.toRadians(updateHeading()));
+        return (float)inchesX;
+    }
+
+    /**
+     * Calculate the amount of Y distance the robot has travelled since the last time this was called
+     * @return float indicating the number of inches traveled
+     */
+    private float getYChange()
+    {
+        double inchesY = ((-(xEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.sin(Math.toRadians( updateHeading() )) +
+                (((yEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.cos(Math.toRadians( updateHeading() ));
+        return (float)inchesY;
+    }
+    /**
      * Update the current velocity.
      * @param currentVelocity  The velocity being set.
      */
@@ -369,12 +448,73 @@ public class SummerBot
     }
 
     /**
+     * Access the current linear velocity in the X direction.
+     * @return float representing the X linear velocity in in/sec
+     */
+    private float getXLinearVelocity()
+    {
+        double linearX = xEncInPerSec * Math.cos(Math.toRadians( updateHeading() )) +
+                yEncInPerSec * Math.sin(Math.toRadians( updateHeading() ));
+        return (float)linearX;
+    }
+
+    /**
+     * Robot - Access the current linear velocity in the Y direction.
+     * @return float representing the Y linear velocity in in/sec
+     */
+    private float getYLinearVelocity()
+    {
+        double linearY = -xEncInPerSec * Math.sin(Math.toRadians( updateHeading() )) +
+                (yEncInPerSec) * Math.cos(Math.toRadians( updateHeading() ));
+        return (float)linearY;
+    }
+
+    /**
      * Robot - calculate the amount of distance the robot has travelled since the last time this was called
      * @return PVector indicating the number of inches traveled in x,y
      */
     public PVector getLocationChange()
     {
         return new PVector(getXChange(), getYChange());
+    }
+
+    public void resetTicks() {
+        resetLeftTicks();
+        resetCenterTicks();
+        resetRightTicks();
+    }
+    public void resetLeftTicks() {
+        leftEncoderPos = leftEncoderMotor.getCurrentPosition();
+    }
+    public int getLeftTicks() {
+        return leftEncoderMotor.getCurrentPosition() - leftEncoderPos;
+    }
+    public void resetRightTicks() {
+        rightEncoderPos = rightEncoderMotor.getCurrentPosition();
+    }
+    public int getRightTicks() {
+        return rightEncoderMotor.getCurrentPosition() - rightEncoderPos;
+    }
+    public void resetCenterTicks() {
+        centerEncoderPos = centerEncoderMotor.getCurrentPosition();
+    }
+    public int getCenterTicks() {
+        return centerEncoderMotor.getCurrentPosition() - centerEncoderPos;
+    }
+    public void drive(double fl, double bl, double fr, double br) {
+        FL.setPower(fl);
+        BL.setPower(bl);
+        FR.setPower(fr);
+        BR.setPower(br);
+    }
+    public void updatePosition() {
+        deltaLeftDistance = (getLeftTicks() / oneRotationTicks) * 2.0 * Math.PI * wheelRadius;
+        deltaRightDistance = (getRightTicks() / oneRotationTicks) * 2.0 * Math.PI * wheelRadius;
+        deltaCenterDistance = (getCenterTicks() / oneRotationTicks) * 2.0 * Math.PI * wheelRadius;
+        x  += (((deltaLeftDistance + deltaRightDistance) / 2.0)) * Math.cos(theta);
+        y  += (((deltaLeftDistance + deltaRightDistance) / 2.0)) * Math.sin(theta);
+        theta  += (deltaLeftDistance - deltaRightDistance) / wheelDistanceApart;
+        resetTicks();
     }
 
 }
