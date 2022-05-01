@@ -34,6 +34,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
@@ -62,7 +63,7 @@ public class SummerBot
     public DcMotorEx leftRear = null;
     public DcMotorEx rightRear = null;
 
-    BNO055IMU imu = null;
+//    BNO055IMU imu = null;
 
     HardwareMap hwMap =  null;
     Telemetry telemetry = null;
@@ -82,41 +83,43 @@ public class SummerBot
     /**
      * Robot - Encoder information used in odometry
      */
-    /** An x-axis velocity measurement. */
-    private double xEncInPerSec;
-    /** A y-axis velocity measurement. */
-    private double yEncInPerSec;
+    /** Encoder velocity measurement. */
+    private double leftEncInPerSec;
+    private double rightEncInPerSec;
+    private double backEncInPerSecond;
+
     /** The radius of the encoder wheels. */
     private final double encWheelRadius = 1.96/2.0; //in inches ... encoder is a 50mm diameter wheel.
-//    private final double encTickPerRotation = 2400;
     /** The number of encoder ticks per rotation of the encoder wheel. */
     private final double encTickPerRotation = 3200;
-//    public static double encDistanceConstant = 195.5/192; //calibrated over 16' & 12' on foam tiles -- 9/13/19
     /** A constant used in calculating robot position change. */
     public static double encDistanceConstant = 1;
     /** The number of inches moved per rotation of the encoder wheel. */
     private final double encInchesPerRotation = 2.0 * encWheelRadius * Math.PI * encDistanceConstant; // this is the encoder wheel distancd
     /** The gearing on the drive train. */
     private final double gearRatio = 1.733333333;
+
+    /** Declares the encoders as an expanded rev hub motor. */
+    private DcMotorEx leftEncoder = null;
+    private DcMotorEx rightEncoder = null;
+    private DcMotorEx backEncoder = null;
+
     /** The number of encoder ticks per inch moved. */
     private final double encTicksPerInch = encTickPerRotation / (encInchesPerRotation);
 
-    /** Used to calculate the change in x position. */
-    private int prevXEncoder = 0;
-    /** Used to calculate the change in y position. */
-    private int prevYEncoder = 0;
-    /** Stores the change in x position. */
-    private int xEncoderChange = 0;
-    /** Stores the change in y position. */
-    private int yEncoderChange = 0;
+    /** Used to calculate the change in position. */
+    private int prevLeftEncoder = 0;
+    private int prevRightEncoder = 0;
+    private int prevBackEncoder = 0;
 
-    /**
-     * Robot - Odometry Items
-     */
-    /** Declares the xEncoder as an expanded rev hub motor. */
-    private DcMotorEx xEncoder = null;
-    /** Declares the yEncoder as an expanded rev hub motor. */
-    private DcMotorEx yEncoder = null;
+    /** Stores the change in  position. */
+    private int leftEncoderChange = 0;
+    private int rightEncoderChange = 0;
+    private int backEncoderChange = 0;
+
+    /** locations for encoders */
+    private double h = 6;
+    private double D = 14;
 
     // Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
     List<LynxModule> allHubs = null;
@@ -170,28 +173,44 @@ public class SummerBot
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        try
-        {
-            // Set up the parameters with which we will use our IMU. Note that integration
-            // algorithm here just reports accelerations to the logcat log; it doesn't actually
-            // provide positional information.
-            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-            parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-            parameters.loggingEnabled = true;
-            parameters.loggingTag = "IMU";
-            parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-            // Retrieve and initialize the IMU.
-            imu = hwMap.get(BNO055IMU.class, "imu");
-            imu.initialize(parameters);
-        }
-        catch (Exception p_exeception)
-        {
-            telemetry.addData("imu not found in config file", 0);
-            imu = null;
-        }
+        // Set up the encoders
+        leftEncoder = hwMap.get(DcMotorEx.class, "leftEncoder");
+        leftEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        leftEncoder.setDirection((DcMotorEx.Direction.REVERSE));
+
+        rightEncoder = hwMap.get(DcMotorEx.class, "rightEncoder");
+        rightEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        rightEncoder.setDirection((DcMotorEx.Direction.FORWARD));
+
+        backEncoder = hwMap.get(DcMotorEx.class, "backEncoder");
+        backEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        backEncoder.setDirection((DcMotorEx.Direction.REVERSE));
+
+
+
+//        try
+//        {
+//            // Set up the parameters with which we will use our IMU. Note that integration
+//            // algorithm here just reports accelerations to the logcat log; it doesn't actually
+//            // provide positional information.
+//            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+//            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+//            parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+//            parameters.loggingEnabled = true;
+//            parameters.loggingTag = "IMU";
+//            parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+//
+//            // Retrieve and initialize the IMU.
+//            imu = hwMap.get(BNO055IMU.class, "imu");
+//            imu.initialize(parameters);
+//        }
+//        catch (Exception p_exeception)
+//        {
+//            telemetry.addData("imu not found in config file", 0);
+//            imu = null;
+//        }
 
         // Get access to a list of Expansion Hub Modules to enable changing caching methods.
         List<LynxModule> allHubs = hwMap.getAll(LynxModule.class);
@@ -218,24 +237,29 @@ public class SummerBot
         /*
          * Update the velocity as read by the encoders
          */
-        double xEncTicksPerSecond = xEncoder.getVelocity() / gearRatio;
-        double yEncTicksPerSecond = yEncoder.getVelocity() / gearRatio;
+        double leftEncTicksPerSecond = leftEncoder.getVelocity() / gearRatio;
+        double rightEncTicksPerSecond = rightEncoder.getVelocity() / gearRatio;
+        double backEncTicksPerSecond = backEncoder.getVelocity() / gearRatio;
 
-        xEncInPerSec = xEncTicksPerSecond / encTicksPerInch;
-        yEncInPerSec = yEncTicksPerSecond / encTicksPerInch;
+        leftEncInPerSec = leftEncTicksPerSecond / encTicksPerInch;
+        rightEncInPerSec = rightEncTicksPerSecond / encTicksPerInch;
+        backEncInPerSecond = backEncTicksPerSecond / encTicksPerInch;
 
         /*
          * Update the position change since the last time as read by the encoders
          */
-        xEncoderChange = xEncoder.getCurrentPosition() - prevXEncoder;
-        yEncoderChange = yEncoder.getCurrentPosition() - prevYEncoder;
+        leftEncoderChange = leftEncoder.getCurrentPosition() - prevLeftEncoder;
+        rightEncoderChange = rightEncoder.getCurrentPosition() - prevRightEncoder;
+        backEncoderChange = backEncoder.getCurrentPosition() - prevBackEncoder;
 
-        updateVelocity(this.getVelocity());
-        updatePosition(this.getLocationChange());
+        updateRobotVelocity();
+        updateRobotPosition();
 
         /* store the current value to use as the previous value the next time around */
-        prevXEncoder = xEncoder.getCurrentPosition();
-        prevYEncoder = yEncoder.getCurrentPosition();
+        prevLeftEncoder = leftEncoder.getCurrentPosition();
+        prevRightEncoder = rightEncoder.getCurrentPosition();
+        prevBackEncoder = backEncoder.getCurrentPosition();
+
     }
 
     /**
@@ -353,8 +377,6 @@ public class SummerBot
         }
     }
 
-
-
     /**
      * This method sets all motor power to 0, causing the robot to stop.
      */
@@ -365,8 +387,6 @@ public class SummerBot
         leftRear.setPower(0);
         rightRear.setPower(0);
     }
-
-
 
     /**
      * Robot - command the Chassis to move according to the desired linear velocity and spin calculated
@@ -396,126 +416,170 @@ public class SummerBot
      */
     public double updateHeading()
     {
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
-    }
+//        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
 
-    /** Update the current location of the robot.
-     * @param currentPosition The position being added to location.
-     * */
-    public void updatePosition(PVector currentPosition)
-    {
-        pursuit.location = PVector.add(pursuit.location, currentPosition);
-    }
+        double deltaLeft = leftEncoderChange / encInchesPerRotation * encInchesPerRotation;
+        double deltaRight = rightEncoderChange / encInchesPerRotation * encInchesPerRotation;
 
-    /**
-     * Calculate the amount of X distance the robot has travelled since the last time this was called
-     * @return float indicating the number of inches traveled
-     */
-    private float getXChange()
-    {
-        double inchesX = (((xEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.cos(Math.toRadians(updateHeading())) +
-                (((yEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.sin(Math.toRadians(updateHeading()));
-        return (float)inchesX;
+        double heading = (deltaRight - deltaLeft ) / D;
+        telemetry.addData("Robot Heading: ", heading);
+        return heading;
     }
 
     /**
-     * Calculate the amount of Y distance the robot has travelled since the last time this was called
-     * @return float indicating the number of inches traveled
+     * Update the current location of the robot
      */
-    private float getYChange()
+    public void updateRobotPosition()
     {
-        double inchesY = ((-(xEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.sin(Math.toRadians( updateHeading() )) +
-                (((yEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.cos(Math.toRadians( updateHeading() ));
-        return (float)inchesY;
+        double deltaBack = backEncoderChange / encTickPerRotation * encInchesPerRotation;
+        double deltaLeft = leftEncoderChange / encInchesPerRotation * encInchesPerRotation;
+        double deltaRight = rightEncoderChange / encInchesPerRotation * encInchesPerRotation;
+
+        double globalXChange =  deltaBack + (deltaRight - deltaLeft)*h/D;
+        double globalYChange = ( deltaLeft + deltaRight ) / 2.0;
+
+
+        PVector positionChange = new PVector((float)globalXChange, (float)globalYChange);
+
+        pursuit.location = PVector.add(pursuit.location, positionChange);
+
+        telemetry.addData("Robot Position: ", pursuit.location);
     }
+
     /**
      * Update the current velocity.
-     * @param currentVelocity  The velocity being set.
      */
-    public void updateVelocity(PVector currentVelocity)
+    public void updateRobotVelocity()
     {
+        double globalXVelocity = backEncInPerSecond + (rightEncInPerSec - leftEncInPerSec)/D*h;
+        double globalYVelocity = ( leftEncInPerSec + rightEncInPerSec ) / 2;
+
+        PVector currentVelocity = new PVector((float)globalXVelocity, (float)globalYVelocity);
         pursuit.velocity.set(currentVelocity.x, currentVelocity.y);
+
+        telemetry.addData("Robot Velocity: ", pursuit.velocity);
     }
 
-    /**
-     * Robot - Get the robot's current linear velocity
-     * @return PVector which captures the current x,y velocity of the robot.
-     */
-    public PVector getVelocity()
-    {
-        return new PVector(getXLinearVelocity(), getYLinearVelocity());
-    }
+//    /**
+//     * Robot - calculate the amount of distance the robot has travelled since the last time this was called
+//     * @return PVector indicating the number of inches traveled in x,y
+//     */
+//    public PVector getGlobalPosChange()
+//    {
+//        //return new PVector(getGlobalXChange(), getGlobalYChange());
+//    }
+//    /**
+//     * Calculate the amount of X distance the robot has travelled since the last time this was called
+//     * @return float indicating the number of inches traveled
+//     */
+//    private float getGlobalXChange()
+//    {
+////        double inchesX = (((leftEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.cos(Math.toRadians(updateHeading())) +
+////                (((rightEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.sin(Math.toRadians(updateHeading()));
+//
+//        double deltaBack = backEncoderChange / encTickPerRotation * encInchesPerRotation;
+//        double deltaLeft = leftEncoderChange / encInchesPerRotation * encInchesPerRotation;
+//        double deltaRight = rightEncoderChange / encInchesPerRotation * encInchesPerRotation;
+//
+//        double globalXChange =  deltaBack + (deltaRight - deltaLeft)*h/D;
+//        return (float)globalXChange;
+//    }
+//
+//    /**
+//     * Calculate the amount of Y distance the robot has travelled since the last time this was called
+//     * @return float indicating the number of inches traveled
+//     */
+//    private float getGlobalYChange()
+//    {
+////        double inchesY = ((-(leftEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.sin(Math.toRadians( updateHeading() )) +
+////                (((rightEncoderChange) / encTickPerRotation) * encInchesPerRotation) * Math.cos(Math.toRadians( updateHeading() ));
+//
+//        double deltaLeft = leftEncoderChange / encInchesPerRotation * encInchesPerRotation;
+//        double deltaRight = rightEncoderChange / encInchesPerRotation * encInchesPerRotation;
+//
+//        double globalYChange = ( deltaLeft + deltaRight ) / 2.0;
+//
+//        return (float)globalYChange;
+//    }
 
-    /**
-     * Access the current linear velocity in the X direction.
-     * @return float representing the X linear velocity in in/sec
-     */
-    private float getXLinearVelocity()
-    {
-        double linearX = xEncInPerSec * Math.cos(Math.toRadians( updateHeading() )) +
-                yEncInPerSec * Math.sin(Math.toRadians( updateHeading() ));
-        return (float)linearX;
-    }
 
-    /**
-     * Robot - Access the current linear velocity in the Y direction.
-     * @return float representing the Y linear velocity in in/sec
-     */
-    private float getYLinearVelocity()
-    {
-        double linearY = -xEncInPerSec * Math.sin(Math.toRadians( updateHeading() )) +
-                (yEncInPerSec) * Math.cos(Math.toRadians( updateHeading() ));
-        return (float)linearY;
-    }
+//    /**
+//     * Robot - Get the robot's current linear velocity
+//     * @return PVector which captures the current x,y velocity of the robot.
+//     */
+//    public PVector getGlobalVelocity()
+//    {
+//        return new PVector(getGlobalXVelocity(), getGlobalYVelocity());
+//    }
+//
+//    /**
+//     * Access the current linear velocity in the X direction.
+//     * @return float representing the X linear velocity in in/sec
+//     */
+//    private float getGlobalXVelocity()
+//    {
+////        double linearX = leftEncInPerSec * Math.cos(Math.toRadians( updateHeading() )) +
+////                rightEncInPerSec * Math.sin(Math.toRadians( updateHeading() ));
+//
+//        double globalXVelocity = backEncInPerSecond + (rightEncInPerSec - leftEncInPerSec)/D*h;
+//
+//        return (float)globalXVelocity;
+//    }
+//
+//    /**
+//     * Robot - Access the current linear velocity in the Y direction.
+//     * @return float representing the Y linear velocity in in/sec
+//     */
+//    private float getGlobalYVelocity()
+//    {
+////        double linearY = -leftEncInPerSec * Math.sin(Math.toRadians( updateHeading() )) +
+////                (rightEncInPerSec) * Math.cos(Math.toRadians( updateHeading() ));
+//
+//        double globalYVelocity = ( leftEncInPerSec + rightEncInPerSec ) / 2;
+//        return (float)globalYVelocity;
+//    }
 
-    /**
-     * Robot - calculate the amount of distance the robot has travelled since the last time this was called
-     * @return PVector indicating the number of inches traveled in x,y
-     */
-    public PVector getLocationChange()
-    {
-        return new PVector(getXChange(), getYChange());
-    }
 
-    public void resetTicks() {
-        resetLeftTicks();
-        resetCenterTicks();
-        resetRightTicks();
-    }
-    public void resetLeftTicks() {
-        leftEncoderPos = leftEncoderMotor.getCurrentPosition();
-    }
-    public int getLeftTicks() {
-        return leftEncoderMotor.getCurrentPosition() - leftEncoderPos;
-    }
-    public void resetRightTicks() {
-        rightEncoderPos = rightEncoderMotor.getCurrentPosition();
-    }
-    public int getRightTicks() {
-        return rightEncoderMotor.getCurrentPosition() - rightEncoderPos;
-    }
-    public void resetCenterTicks() {
-        centerEncoderPos = centerEncoderMotor.getCurrentPosition();
-    }
-    public int getCenterTicks() {
-        return centerEncoderMotor.getCurrentPosition() - centerEncoderPos;
-    }
-    public void drive(double fl, double bl, double fr, double br) {
-        FL.setPower(fl);
-        BL.setPower(bl);
-        FR.setPower(fr);
-        BR.setPower(br);
-    }
-    public void updatePosition() {
-        deltaLeftDistance = (getLeftTicks() / oneRotationTicks) * 2.0 * Math.PI * wheelRadius;
-        deltaRightDistance = (getRightTicks() / oneRotationTicks) * 2.0 * Math.PI * wheelRadius;
-        deltaCenterDistance = (getCenterTicks() / oneRotationTicks) * 2.0 * Math.PI * wheelRadius;
-        x  += (((deltaLeftDistance + deltaRightDistance) / 2.0)) * Math.cos(theta);
-        y  += (((deltaLeftDistance + deltaRightDistance) / 2.0)) * Math.sin(theta);
-        theta  += (deltaLeftDistance - deltaRightDistance) / wheelDistanceApart;
-        resetTicks();
-    }
+
+//    public void resetTicks() {
+//        resetLeftTicks();
+//        resetCenterTicks();
+//        resetRightTicks();
+//    }
+//    public void resetLeftTicks() {
+//        leftEncoderPos = leftEncoder.getCurrentPosition();
+//    }
+//    public int getLeftTicks() {
+//        return leftEncoder.getCurrentPosition() - leftEncoderPos;
+//    }
+//    public void resetRightTicks() {
+//        rightEncoderPos = rightEncoder.getCurrentPosition();
+//    }
+//    public int getRightTicks() {
+//        return rightEncoder.getCurrentPosition() - rightEncoderPos;
+//    }
+//    public void resetCenterTicks() {
+//        centerEncoderPos = centerEncoderMotor.getCurrentPosition();
+//    }
+//    public int getCenterTicks() {
+//        return centerEncoderMotor.getCurrentPosition() - centerEncoderPos;
+//    }
+//    public void drive(double fl, double bl, double fr, double br) {
+//        FL.setPower(fl);
+//        BL.setPower(bl);
+//        FR.setPower(fr);
+//        BR.setPower(br);
+//    }
+//    public void updatePosition() {
+//        deltaLeftDistance = (getLeftTicks() / oneRotationTicks) * 2.0 * Math.PI * wheelRadius;
+//        deltaRightDistance = (getRightTicks() / oneRotationTicks) * 2.0 * Math.PI * wheelRadius;
+//        deltaCenterDistance = (getCenterTicks() / oneRotationTicks) * 2.0 * Math.PI * wheelRadius;
+//        x  += (((deltaLeftDistance + deltaRightDistance) / 2.0)) * Math.cos(theta);
+//        y  += (((deltaLeftDistance + deltaRightDistance) / 2.0)) * Math.sin(theta);
+//        theta  += (deltaLeftDistance - deltaRightDistance) / wheelDistanceApart;
+//        resetTicks();
+//    }
 
 }
 
