@@ -28,7 +28,7 @@ public class SummerTeleop extends OpMode
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, telemetry);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Init", "Complete");    //
@@ -49,20 +49,20 @@ public class SummerTeleop extends OpMode
     @Override
     public void loop()
     {
-        double forward;
-        double right;
-        double clockwise;
+        // Tell the robot to update its position, velocity
+        robot.update();
 
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        forward = -gamepad1.left_stick_y;
-        right = gamepad1.left_stick_x;
-        clockwise = gamepad1.right_stick_x;
+        double forward = -gamepad1.left_stick_y;
+        double right = gamepad1.left_stick_x;
+        double clockwise = gamepad1.right_stick_x;
 
         robot.joystickDrive(forward, clockwise, right);
 
         telemetry.addData("forward: ",  "%.2f", forward);
         telemetry.addData("right: ", "%.2f", right);
         telemetry.addData("clockwise: ", "%.2f", clockwise);
+
     }
 
     /**

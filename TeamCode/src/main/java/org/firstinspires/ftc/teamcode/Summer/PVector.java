@@ -284,7 +284,6 @@ public class PVector implements Serializable
         x += v.x;
         y += v.y;
         z += v.z;
-
         return this;
     }
 
@@ -695,8 +694,7 @@ public class PVector implements Serializable
      */
     public float heading()
     {
-        float angle = (float) Math.atan2(y, x);
-        return angle;
+        return (float) Math.atan2(y, x);
     }
 
 
