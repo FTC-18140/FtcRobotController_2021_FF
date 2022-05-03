@@ -6,24 +6,33 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class PathFollower
 {
 
+    // Keep track of the robot's position and velocity with the following PVector variables
     PVector location;
     PVector velocity;
-    PVector acceleration;
-    float radius;
+
+    float radius;   // The distance around a path point which indicates when the robot either needs
+                    // to move to the next path point or stop moving.
+
+    float pathLookahead = 10;  // The amount of lookahead distance when calculating the target point for pursuit
+
     float maxAccel;    // Maximum steering acceleration
     float maxSpeed;    // Maximum speed
-    float pathLookahead = 10;
 
-    int currentSegment = 0;
-    boolean lastSegment = false;
-    boolean arrived = false;
+    int currentSegment = 0;  // Holds the index of the current segment of the path the robot is pursuing
 
-    PVector start = null;
-    PVector end = null;
-    PVector pursuitVelocity = null;
+    boolean lastSegment = false;  // whether or not the robot is on the last segment of the path
 
+    boolean arrived = false; // whether or not the robot has finished pursuing the path and has arrived
+                             // at the last point in the path
 
-    Telemetry telemetry;
+    PVector start = null; // Used to reference the current segment's starting point
+    PVector end = null;  // Used to reference the current segment's ending point
+
+    PVector pursuitVelocity = null;  // The resultant velocity required for the robot to pursue the target
+                                     // point.  This is the velocity that is calculated each time follow
+                                     // is called.
+
+    Telemetry telemetry; // Used to send telemetry updates to help troubleshoot the process
 
     /**
      * Constructor to create a PathFollower
@@ -38,11 +47,9 @@ public class PathFollower
         radius = 4.0f;
         maxSpeed = theMaxSpeed;
         maxAccel = theMaxAccel;
-        acceleration = new PVector(0, 0);
         velocity = new PVector(maxSpeed, 0);
         telemetry = theTelemetry;
     }
-
 
     /**
      * This function implements Craig Reynolds' path following algorithm to follow the Path parameter
