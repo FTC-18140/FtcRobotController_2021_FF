@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name="Teleop", group="Teleop")
-public class Teleop extends OpMode {
+public class TBTeleop extends OpMode {
     //    Thunderbot_2021 robot = new Thunderbot_2021();
     //motors
     Thunderbot_2021 robot = new Thunderbot_2021();

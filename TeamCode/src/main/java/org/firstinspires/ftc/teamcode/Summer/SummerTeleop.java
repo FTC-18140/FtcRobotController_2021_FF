@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * All device access is managed through the SummerBot class.
  */
 
-@TeleOp(name="Teleop", group="Summer")
+@TeleOp(name="SummerTeleop", group="Summer")
 public class SummerTeleop extends OpMode
 {
 

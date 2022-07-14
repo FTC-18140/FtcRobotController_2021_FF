@@ -141,10 +141,10 @@ public class SummerBot
         pursuit = new PathFollower( new PVector(0,0), 10, 10, telemetry );
 
         // Define and Initialize Motors
-        leftFront = hwMap.get(DcMotorEx.class, "lf");
-        rightFront = hwMap.get(DcMotorEx.class, "rf");
-        leftRear = hwMap.get(DcMotorEx.class, "lr");
-        rightRear = hwMap.get(DcMotorEx.class, "rr");
+        leftFront = hwMap.get(DcMotorEx.class, "leftFront");
+        rightFront = hwMap.get(DcMotorEx.class, "rightFront");
+        leftRear = hwMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hwMap.get(DcMotorEx.class, "rightRear");
 
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
@@ -167,17 +167,17 @@ public class SummerBot
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Set up the encoders
-        leftEncoder = hwMap.get(DcMotorEx.class, "leftEncoder");
-        leftEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        leftEncoder.setDirection((DcMotorEx.Direction.REVERSE));
-
-        rightEncoder = hwMap.get(DcMotorEx.class, "rightEncoder");
-        rightEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        rightEncoder.setDirection((DcMotorEx.Direction.FORWARD));
-
-        backEncoder = hwMap.get(DcMotorEx.class, "backEncoder");
-        backEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        backEncoder.setDirection((DcMotorEx.Direction.REVERSE));
+//        leftEncoder = hwMap.get(DcMotorEx.class, "leftEncoder");
+//        leftEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//        leftEncoder.setDirection((DcMotorEx.Direction.REVERSE));
+//
+//        rightEncoder = hwMap.get(DcMotorEx.class, "rightEncoder");
+//        rightEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//        rightEncoder.setDirection((DcMotorEx.Direction.FORWARD));
+//
+//        backEncoder = hwMap.get(DcMotorEx.class, "backEncoder");
+//        backEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//        backEncoder.setDirection((DcMotorEx.Direction.REVERSE));
 
         // Get access to a list of Expansion Hub Modules to enable changing caching methods.
         List<LynxModule> allHubs = hwMap.getAll(LynxModule.class);
@@ -200,8 +200,8 @@ public class SummerBot
         {
             module.clearBulkCache();
         }
-        updateRobotVelocity();
-        updateRobotPosition();
+ //       updateRobotVelocity();
+ //       updateRobotPosition();
     }
 
     /**
