@@ -41,6 +41,7 @@ public class SummerTeleop extends OpMode
     public void start()
     {
         // Do nothing
+        resetStartTime();
     }
 
     /**
@@ -57,11 +58,14 @@ public class SummerTeleop extends OpMode
         double right = gamepad1.left_stick_x;
         double clockwise = gamepad1.right_stick_x;
 
-        robot.joystickDrive(forward, clockwise, right);
+        robot.joystickDrive(forward, right, clockwise);
 
-        telemetry.addData("forward: ",  "%.2f", forward);
-        telemetry.addData("right: ", "%.2f", right);
-        telemetry.addData("clockwise: ", "%.2f", clockwise);
+//        telemetry.addData("forward: ",  "%.2f", forward);
+//        telemetry.addData("right: ", "%.2f", right);
+//        telemetry.addData("clockwise: ", "%.2f", clockwise);
+
+        telemetry.addData("Loop Time: ", "%.4f", getRuntime());
+        resetStartTime();
 
     }
 

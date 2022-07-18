@@ -85,3 +85,9 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+java_pid2454.hprof
+.idea/compiler.xml
+.idea/deploymentTargetDropDown.xml
+.idea/jarRepositories.xml
+.idea/misc.xml
+TeamCode/src/main/java/BasicOpMode_Iterative.java

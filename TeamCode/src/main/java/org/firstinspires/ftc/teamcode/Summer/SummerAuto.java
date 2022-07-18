@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Thunderbot_2021;
 
-@Autonomous(name="Auto", group="Summer")
+@Autonomous(name="Auton", group="Summer")
 public class SummerAuto extends OpMode
 {
     SummerBot robot = new SummerBot();

@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 @Autonomous(name="Auto", group="Auto")
 //@Disabled
-public class Auto extends OpMode {
+public class Auto extends OpMode
+{
     Thunderbot_2021 robot = new Thunderbot_2021();
 
     public void init() {

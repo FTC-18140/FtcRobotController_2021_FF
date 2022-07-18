@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode.Summer;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -36,9 +38,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.util.List;
 
+import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 
 /**
@@ -55,6 +62,8 @@ public class SummerBot
     public DcMotorEx rightFront = null;
     public DcMotorEx leftRear = null;
     public DcMotorEx rightRear = null;
+    /** Declares the internal rev imu. */
+    private BNO055IMU gyro;
 
     HardwareMap hwMap =  null;
     Telemetry telemetry = null;
@@ -62,6 +71,7 @@ public class SummerBot
     boolean moving = false;
     double gyStartAngle = 0;
     double initialPosition = 0;
+    double heading = gyStartAngle;
 
     // converts inches to motor ticks
     static final double COUNTS_PER_MOTOR_REV = 28.0; // rev robotics hd hex motors planetary-411600
@@ -78,15 +88,15 @@ public class SummerBot
     private double backEncInPerSecond;
 
     /** The radius of the encoder wheels. */
-    private final double encWheelRadius = 1.96/2.0; //in inches ... encoder is a 50mm diameter wheel.
+    private final double encWheelRadius = (35.0/25.4)/2.0; //in inches ... encoder is a 35mm diameter wheel.
     /** The number of encoder ticks per rotation of the encoder wheel. */
-    private final double encTickPerRotation = 3200;
+    private final double encTickPerRotation = 8192;
     /** A constant used in calculating robot position change. */
     public static double encDistanceConstant = 1;
     /** The number of inches moved per rotation of the encoder wheel. */
     private final double encInchesPerRotation = 2.0 * encWheelRadius * Math.PI * encDistanceConstant; // this is the encoder wheel distance
     /** The gearing on the drive train. */
-    private final double gearRatio = 1.733333333;
+    private final double gearRatio = 1.0;
 
     /** Declares the encoders as an expanded rev hub motor. */
     private DcMotorEx leftEncoder = null;
@@ -107,8 +117,9 @@ public class SummerBot
     private int backEncoderChange = 0;
 
     /** locations for encoders */
-    private final double h = 6;
-    private final double D = 14;
+    private final double h = 9;
+    private final double hy = 1.75;
+    private final double D = 16.25;
 
     /**
      * Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
@@ -140,6 +151,19 @@ public class SummerBot
 
         pursuit = new PathFollower( new PVector(0,0), 10, 10, telemetry );
 
+        // Set up the encoders -- Do this before motors
+        leftEncoder = hwMap.get(DcMotorEx.class, "leftFront");
+        leftEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        //leftEncoder.setDirection((DcMotorEx.Direction.REVERSE));
+
+        rightEncoder = hwMap.get(DcMotorEx.class, "rightRear");
+        rightEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        //rightEncoder.setDirection((DcMotorEx.Direction.FORWARD));
+
+        backEncoder = hwMap.get(DcMotorEx.class, "rightFront");
+        backEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        //backEncoder.setDirection((DcMotorEx.Direction.REVERSE));
+
         // Define and Initialize Motors
         leftFront = hwMap.get(DcMotorEx.class, "leftFront");
         rightFront = hwMap.get(DcMotorEx.class, "rightFront");
@@ -151,36 +175,52 @@ public class SummerBot
         leftRear.setDirection(DcMotor.Direction.REVERSE);
         rightRear.setDirection(DcMotor.Direction.FORWARD);
 
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Set all motors to zero power
         stop();
 
         // Use RUN_USING_ENCODERS if encoders are installed.
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Reset the motors
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Set up the encoders
-//        leftEncoder = hwMap.get(DcMotorEx.class, "leftEncoder");
-//        leftEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-//        leftEncoder.setDirection((DcMotorEx.Direction.REVERSE));
-//
-//        rightEncoder = hwMap.get(DcMotorEx.class, "rightEncoder");
-//        rightEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-//        rightEncoder.setDirection((DcMotorEx.Direction.FORWARD));
-//
-//        backEncoder = hwMap.get(DcMotorEx.class, "backEncoder");
-//        backEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-//        backEncoder.setDirection((DcMotorEx.Direction.REVERSE));
+
+        try
+        {
+            // Set up the parameters with which we will use our IMU. Note that integration
+            // algorithm here just reports accelerations to the logcat log; it doesn't actually
+            // provide positional information.
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+            parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+            parameters.loggingEnabled = true;
+            parameters.loggingTag = "IMU";
+            parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+            // Retrieve and initialize the IMU.
+            gyro = hwMap.get(BNO055IMU.class, "imu");
+            gyro.initialize(parameters);
+        }
+        catch (Exception p_exeception)
+        {
+            telemetry.addData("imu not found in config file", 0);
+            gyro = null;
+        }
+
 
         // Get access to a list of Expansion Hub Modules to enable changing caching methods.
-        List<LynxModule> allHubs = hwMap.getAll(LynxModule.class);
+        allHubs = hwMap.getAll(LynxModule.class);
 
         // Set all Expansion hubs to use the MANUAL Bulk Caching mode
         for (LynxModule module : allHubs)
@@ -200,8 +240,8 @@ public class SummerBot
         {
             module.clearBulkCache();
         }
- //       updateRobotVelocity();
- //       updateRobotPosition();
+        updateRobotVelocity();
+        updateRobotPosition();
     }
 
     /**
@@ -252,7 +292,8 @@ public class SummerBot
     public boolean gyroDrive (double direction, double distance, double power)
     {
 
-        double currentAngle = updateHeading();
+        updateHeading();
+        double currentAngle = heading;
         telemetry.addData("current angle", currentAngle);
 
         // Set desired angle and initial position
@@ -350,17 +391,19 @@ public class SummerBot
     }
 
     /**
-     * Get the heading in whatever means you are implementing.  Right now, use the imu.
+     * Get the heading in whatever means you are implementing.
      * @return heading in degrees
      */
-    private double updateHeading()
+    private void updateHeading()
     {
-        double deltaLeft = leftEncoderChange / encInchesPerRotation * encInchesPerRotation;
-        double deltaRight = rightEncoderChange / encInchesPerRotation * encInchesPerRotation;
+        double deltaLeft = leftEncoderChange / encTicksPerInch;
+        double deltaRight = rightEncoderChange / encTicksPerInch;
 
-        double heading = (deltaRight - deltaLeft ) / D;
-        telemetry.addData("Robot Heading: ", heading);
-        return heading;
+        double headingChange = (deltaLeft - deltaRight ) / D;
+        heading += Math.toDegrees(headingChange);
+
+        telemetry.addData("Robot Heading: ", "%0.3f", heading);
+        return;
     }
 
     /**
@@ -368,32 +411,51 @@ public class SummerBot
      */
     private void updateRobotPosition()
     {
-
         //
         // Update the position change since the last time as read by the encoders
         //
-        leftEncoderChange = leftEncoder.getCurrentPosition() - prevLeftEncoder;
-        rightEncoderChange = rightEncoder.getCurrentPosition() - prevRightEncoder;
-        backEncoderChange = backEncoder.getCurrentPosition() - prevBackEncoder;
+        int curLeftEnc = leftEncoder.getCurrentPosition();
+        int curRightEnc = rightEncoder.getCurrentPosition();
+        int curBackEnc = backEncoder.getCurrentPosition();
 
-        double deltaBack = backEncoderChange / encTickPerRotation * encInchesPerRotation;
-        double deltaLeft = leftEncoderChange / encInchesPerRotation * encInchesPerRotation;
-        double deltaRight = rightEncoderChange / encInchesPerRotation * encInchesPerRotation;
+        leftEncoderChange = curLeftEnc - prevLeftEncoder;
+        rightEncoderChange = curRightEnc - prevRightEncoder);
+        backEncoderChange = curBackEnc - prevBackEncoder;
 
-        double globalXChange =  deltaBack + (deltaRight - deltaLeft)*h/D;
-        double globalYChange = ( deltaLeft + deltaRight ) / 2.0;
+        telemetry.addData("Left Encoder Value: ", leftEncoder.getCurrentPosition());
+        telemetry.addData("Right Encoder Value: ", rightEncoder.getCurrentPosition());
 
-        PVector positionChange = new PVector((float)globalXChange, (float)globalYChange);
-        pursuit.setPosition( positionChange );
+        // Calculate the change in inches travelled for each encoder
+        double deltaBack = backEncoderChange / encTicksPerInch;
+        double deltaLeft = leftEncoderChange / encTicksPerInch ;
+        double deltaRight = rightEncoderChange / encTicksPerInch;
 
-        telemetry.addData("Robot Position: ", pursuit.location);
+//        telemetry.addData("deltaLeft: ", deltaLeft);
+//        telemetry.addData("deltaRight: ", deltaRight);
+//        telemetry.addData("deltaBack: ", deltaBack);
+
+        // Conert encoder changes into local robot-centric coordinate updates
+        double headingChange = (deltaLeft - deltaRight ) / D;
+        double xChange =  deltaBack - h * headingChange;
+        double yChange = ( deltaLeft + deltaRight ) / 2.0;
+
+        // Update global coordinates and heading based on calculations and measurements
+        heading += Math.toDegrees(headingChange);
+        double headingRad = Math.toRadians(heading);
+        double globalXChange = xChange * Math.cos(headingRad) - yChange * Math.sin(headingRad);
+        double globalYChange = xChange * Math.sin(headingRad) + yChange * Math.cos(headingRad);
+
+        pursuit.setPosition( new PVector((float)globalXChange, (float)globalYChange) );
+
+        telemetry.addData("Robot Position: ", "%.3f, %.3f", pursuit.location.x, pursuit.location.y);
+        telemetry.addData("Robot Heading: ", "%0.3f", heading);
 
         //
         // Store the current value to use as the previous value the next time around
         //
-        prevLeftEncoder = leftEncoder.getCurrentPosition();
-        prevRightEncoder = rightEncoder.getCurrentPosition();
-        prevBackEncoder = backEncoder.getCurrentPosition();
+        prevLeftEncoder = curLeftEnc;
+        prevRightEncoder = curRightEnc;
+        prevBackEncoder = curBackEnc;
     }
 
     /**
@@ -420,7 +482,11 @@ public class SummerBot
 
         telemetry.addData("Robot Velocity: ", pursuit.velocity);
     }
-
+    private double updateHeadingRaw()
+    {
+        Orientation angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
+    }
 
 }
 
