@@ -58,7 +58,14 @@ public class SummerTeleop extends OpMode
         double right = gamepad1.left_stick_x;
         double clockwise = gamepad1.right_stick_x;
 
-        robot.joystickDrive(forward, right, clockwise);
+        if (gamepad1.left_bumper)
+        {
+            robot.joystickDrive(forward, right, clockwise);
+        }
+        else
+        {
+            robot.joystickDrive(0.25*forward, 0.25*right, 0.25*clockwise);
+        }
 
 //        telemetry.addData("forward: ",  "%.2f", forward);
 //        telemetry.addData("right: ", "%.2f", right);

@@ -35,6 +35,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -117,8 +118,7 @@ public class SummerBot
     private int backEncoderChange = 0;
 
     /** locations for encoders */
-    private final double h = 9;
-    private final double hy = 1.75;
+    private final double h = -9;
     private final double D = 16.25;
 
     /**
@@ -154,15 +154,12 @@ public class SummerBot
         // Set up the encoders -- Do this before motors
         leftEncoder = hwMap.get(DcMotorEx.class, "leftFront");
         leftEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        //leftEncoder.setDirection((DcMotorEx.Direction.REVERSE));
 
         rightEncoder = hwMap.get(DcMotorEx.class, "rightRear");
         rightEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        //rightEncoder.setDirection((DcMotorEx.Direction.FORWARD));
 
         backEncoder = hwMap.get(DcMotorEx.class, "rightFront");
         backEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        //backEncoder.setDirection((DcMotorEx.Direction.REVERSE));
 
         // Define and Initialize Motors
         leftFront = hwMap.get(DcMotorEx.class, "leftFront");
@@ -217,7 +214,6 @@ public class SummerBot
             telemetry.addData("imu not found in config file", 0);
             gyro = null;
         }
-
 
         // Get access to a list of Expansion Hub Modules to enable changing caching methods.
         allHubs = hwMap.getAll(LynxModule.class);
@@ -402,8 +398,7 @@ public class SummerBot
         double headingChange = (deltaLeft - deltaRight ) / D;
         heading += Math.toDegrees(headingChange);
 
-        telemetry.addData("Robot Heading: ", "%0.3f", heading);
-        return;
+        telemetry.addData("Robot Heading: ", "%.3f", heading);
     }
 
     /**
@@ -411,19 +406,20 @@ public class SummerBot
      */
     private void updateRobotPosition()
     {
+
         //
         // Update the position change since the last time as read by the encoders
         //
         int curLeftEnc = leftEncoder.getCurrentPosition();
-        int curRightEnc = rightEncoder.getCurrentPosition();
+        int curRightEnc = -rightEncoder.getCurrentPosition();
         int curBackEnc = backEncoder.getCurrentPosition();
 
         leftEncoderChange = curLeftEnc - prevLeftEncoder;
-        rightEncoderChange = curRightEnc - prevRightEncoder);
+        rightEncoderChange = curRightEnc - prevRightEncoder;
         backEncoderChange = curBackEnc - prevBackEncoder;
 
-        telemetry.addData("Left Encoder Value: ", leftEncoder.getCurrentPosition());
-        telemetry.addData("Right Encoder Value: ", rightEncoder.getCurrentPosition());
+        telemetry.addData("Encoder Values: ", "%d, %d", curLeftEnc, curRightEnc);
+        telemetry.addData("Back Encoder: ", "%d", curBackEnc);
 
         // Calculate the change in inches travelled for each encoder
         double deltaBack = backEncoderChange / encTicksPerInch;
@@ -436,19 +432,45 @@ public class SummerBot
 
         // Conert encoder changes into local robot-centric coordinate updates
         double headingChange = (deltaLeft - deltaRight ) / D;
+
+        double param1 = 1;
+        double param2 = 0;
+        double param3 = 0;
+        double param4 = 1;
+
+        if (Math.abs(Math.toDegrees(headingChange)) > 5)
+        {
+            param1 = Math.sin(headingChange) / headingChange;
+            param2 = (Math.cos(headingChange) - 1) / headingChange;
+            param3 = (1 - Math.cos(headingChange)) / headingChange;
+            param4 = param1;
+        }
+
+        telemetry.addData("HeadingChange: ", "%.3f deg", Math.toDegrees(headingChange));
+        telemetry.addData("deltaBack: ", "%.3f", deltaBack);
+
         double xChange =  deltaBack - h * headingChange;
         double yChange = ( deltaLeft + deltaRight ) / 2.0;
+
+        telemetry.addData("xChange, yChange: ", "(%.3f, %.3f)", xChange, yChange);
+
 
         // Update global coordinates and heading based on calculations and measurements
         heading += Math.toDegrees(headingChange);
         double headingRad = Math.toRadians(heading);
-        double globalXChange = xChange * Math.cos(headingRad) - yChange * Math.sin(headingRad);
-        double globalYChange = xChange * Math.sin(headingRad) + yChange * Math.cos(headingRad);
+
+        double xChangeR = param1 * xChange + param2 * yChange;
+        double yChangeR = param3 * xChange + param4 * yChange;
+
+        telemetry.addData("xChangeR, yChangeR: ", "(%.3f, %.3f)", xChangeR, yChangeR);
+
+        double globalXChange = xChangeR * Math.cos(headingRad) - yChangeR * Math.sin(headingRad);
+        double globalYChange = xChangeR * Math.sin(headingRad) + yChangeR * Math.cos(headingRad);
 
         pursuit.setPosition( new PVector((float)globalXChange, (float)globalYChange) );
 
-        telemetry.addData("Robot Position: ", "%.3f, %.3f", pursuit.location.x, pursuit.location.y);
-        telemetry.addData("Robot Heading: ", "%0.3f", heading);
+        telemetry.addData("Robot Position: ", "(%.3f, %.3f)", pursuit.location.x, pursuit.location.y);
+        telemetry.addData("Robot Heading: ", "%.3f deg", heading);
 
         //
         // Store the current value to use as the previous value the next time around
